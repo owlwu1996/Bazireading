@@ -1,14 +1,22 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, Check, ArrowLeft, CreditCard, Wallet } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { API_URLS } from '../lib/api';
+
+declare global {
+  interface Window {
+    paypal?: any;
+  }
+}
 
 export default function Pricing() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'paypal'>('stripe');
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'paypal'>('paypal');
+  const [loading, setLoading] = useState(false);
+  const paypalRef = useRef<HTMLDivElement>(null);
 
   const plans = [
     {
@@ -62,10 +70,101 @@ export default function Pricing() {
     },
   ];
 
-  const handlePayment = async () => {
+  const selectedPlanInfo = plans.find((p) => p.id === selectedPlan);
+
+  useEffect(() => {
+    if (selectedPlan && paymentMethod === 'paypal' && paypalRef.current) {
+      loadPayPalButton();
+    }
+  }, [selectedPlan, paymentMethod]);
+
+  const loadPayPalButton = () => {
+    if (!paypalRef.current) return;
+    paypalRef.current.innerHTML = '';
+
+    if (window.paypal) {
+      renderPayPalButton();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${import.meta.env.VITE_PAYPAL_CLIENT_ID || 'test'}&currency=USD`;
+    script.async = true;
+    script.onload = renderPayPalButton;
+    document.body.appendChild(script);
+  };
+
+  const renderPayPalButton = () => {
+    if (!window.paypal || !paypalRef.current) return;
+
+    window.paypal.Buttons({
+      createOrder: async () => {
+        setLoading(true);
+        try {
+          const response = await fetch(API_URLS.paypalCreateOrder, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ plan: selectedPlan }),
+          });
+
+          const data = await response.json();
+          if (data.paypalOrderId) {
+            return data.paypalOrderId;
+          }
+          throw new Error('Failed to create order');
+        } catch (error) {
+          console.error('PayPal create order error:', error);
+          alert('Failed to initialize PayPal payment');
+          setLoading(false);
+          throw error;
+        }
+      },
+      onApprove: async (data: any, actions: any) => {
+        try {
+          const orderResponse = await fetch(API_URLS.paypalCapture, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              paypalOrderId: data.orderID,
+            }),
+          });
+
+          const orderResult = await orderResponse.json();
+          if (!orderResult.success) {
+            throw new Error('Backend capture failed');
+          }
+
+          const details = await actions.order.capture();
+
+          if (details.status === 'COMPLETED') {
+            alert('Payment successful! Thank you for your purchase.');
+            navigate('/');
+          } else {
+            alert('Payment failed. Please try again.');
+          }
+        } catch (error) {
+          console.error('PayPal capture error:', error);
+          alert('Payment failed. Please try again.');
+        } finally {
+          setLoading(false);
+        }
+      },
+      onError: (err: any) => {
+        console.error('PayPal error:', err);
+        alert('PayPal payment error. Please try again.');
+        setLoading(false);
+      },
+      onCancel: () => {
+        setLoading(false);
+      },
+    }).render(paypalRef.current);
+  };
+
+  const handleStripePayment = async () => {
     if (!selectedPlan) return;
 
     try {
+      setLoading(true);
       const response = await fetch(API_URLS.paymentCreateIntent, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -87,6 +186,8 @@ export default function Pricing() {
     } catch (error) {
       console.error('Payment error:', error);
       alert('Payment failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -172,13 +273,18 @@ export default function Pricing() {
                 PayPal
               </button>
             </div>
-            <button
-              onClick={handlePayment}
-              className="w-full py-4 bg-gradient-to-r from-[#D4A853] to-[#B87333] text-[#0F0F0F] font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(212,168,83,0.3)] transition-all"
-            >
-              Pay {plans.find((p) => p.id === selectedPlan)?.price}
-              {plans.find((p) => p.id === selectedPlan)?.period}
-            </button>
+
+            {paymentMethod === 'paypal' ? (
+              <div ref={paypalRef} className="flex justify-center" />
+            ) : (
+              <button
+                onClick={handleStripePayment}
+                disabled={loading}
+                className="w-full py-4 bg-gradient-to-r from-[#D4A853] to-[#B87333] text-[#0F0F0F] font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(212,168,83,0.3)] transition-all disabled:opacity-50"
+              >
+                {loading ? 'Processing...' : `Pay ${selectedPlanInfo?.price}${selectedPlanInfo?.period}`}
+              </button>
+            )}
           </div>
         )}
       </div>

@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import baziRoutes from './routes/bazi';
 import paymentRoutes from './routes/payment';
+import paypalRoutes from './routes/paypal';
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 
 app.use('/api/bazi', baziRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/paypal', paypalRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

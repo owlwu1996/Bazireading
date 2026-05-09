@@ -6,4 +6,6 @@ export const API_URLS = {
   baziCompatibility: `${API_BASE}/api/bazi/compatibility`,
   paymentCreateIntent: `${API_BASE}/api/payment/create-intent`,
   paymentConfirm: `${API_BASE}/api/payment/confirm`,
+  paypalCreateOrder: `${API_BASE}/api/paypal/create-order`,
+  paypalCapture: `${API_BASE}/api/paypal/capture`,
 };

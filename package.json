@@ -23,6 +23,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^4.21.2",
+    "@paypal/checkout-server-sdk": "^1.0.3",
     "i18next": "^26.0.10",
     "i18next-browser-languagedetector": "^8.2.1",
     "jsonwebtoken": "^9.0.3",
