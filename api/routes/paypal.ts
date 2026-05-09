@@ -53,38 +53,42 @@ router.post('/capture', async (req, res) => {
   try {
     const { paypalOrderId } = req.body;
 
-    const orderStmt = db.prepare('SELECT * FROM orders WHERE payment_id = ?');
-    const order = orderStmt.get(paypalOrderId) as any;
+    const captureResult = await captureOrder(paypalOrderId);
 
-    if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
-    }
+    if (captureResult.status === 'COMPLETED') {
+      const orderStmt = db.prepare('SELECT * FROM orders WHERE payment_id = ?');
+      const order = orderStmt.get(paypalOrderId) as any;
 
-    const updateStmt = db.prepare(`
-      UPDATE orders SET status = 'completed', paid_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `);
-    updateStmt.run(order.id);
+      if (order) {
+        const updateStmt = db.prepare(`
+          UPDATE orders SET status = 'completed', paid_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `);
+        updateStmt.run(order.id);
 
-    if (order.plan_type === 'monthly' || order.plan_type === 'yearly') {
-      const expiresAt = new Date();
-      if (order.plan_type === 'monthly') {
-        expiresAt.setMonth(expiresAt.getMonth() + 1);
-      } else {
-        expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+        if (order.plan_type === 'monthly' || order.plan_type === 'yearly') {
+          const expiresAt = new Date();
+          if (order.plan_type === 'monthly') {
+            expiresAt.setMonth(expiresAt.getMonth() + 1);
+          } else {
+            expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+          }
+
+          const subStmt = db.prepare(`
+            INSERT OR REPLACE INTO subscriptions (user_id, plan_type, status, expires_at)
+            VALUES (?, ?, 'active', ?)
+          `);
+          subStmt.run(order.user_id || 0, order.plan_type, expiresAt.toISOString());
+        }
       }
 
-      const subStmt = db.prepare(`
-        INSERT OR REPLACE INTO subscriptions (user_id, plan_type, status, expires_at)
-        VALUES (?, ?, 'active', ?)
-      `);
-      subStmt.run(order.user_id || 0, order.plan_type, expiresAt.toISOString());
+      res.json({ success: true, message: 'Payment completed' });
+    } else {
+      res.status(400).json({ error: 'Payment not completed', status: captureResult.status });
     }
-
-    res.json({ success: true, message: 'Payment completed' });
   } catch (error) {
     console.error('PayPal capture error:', error);
-    res.status(500).json({ error: 'Failed to process payment' });
+    res.status(500).json({ error: 'Failed to capture payment' });
   }
 });
 
