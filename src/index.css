@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Outfit', sans-serif;
+    background-color: #0F0F0F;
+    color: #F5F0E8;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cinzel', serif;
+  }
+
+  p {
+    font-family: 'Crimson Text', serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-gradient-to-r from-[#D4A853] to-[#B87333] text-[#0F0F0F] font-semibold rounded-lg transition-all;
+  }
+
+  .btn-primary:hover {
+    @apply shadow-[0_0_30px_rgba(212,168,83,0.3)] scale-105;
+  }
+
+  .card {
+    @apply bg-[#1a1a1a]/50 border border-[#D4A853]/10 rounded-xl p-6;
+  }
+
+  .card:hover {
+    @apply border-[#D4A853]/30 bg-[#1a1a1a]/80;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-[#0F0F0F] border border-[#D4A853]/20 rounded-lg text-[#F5F0E8] placeholder-[#F5F0E8]/30;
+  }
+
+  .input-field:focus {
+    @apply border-[#D4A853] outline-none ring-1 ring-[#D4A853]/30;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0F0F0F;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4A853/30;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D4A853/50;
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(212, 168, 83, 0.3);
+  color: #F5F0E8;
+}
