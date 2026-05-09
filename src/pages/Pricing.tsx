@@ -15,8 +15,8 @@ const PADDLE_ENVIRONMENT = 'sandbox'; // Change to 'production' when live
 // Product IDs from Paddle Dashboard
 const PADDLE_PRODUCTS = {
   single: 'pro_01kr6h63sderby6y2y99fhkgry',
-  monthly: 'pro_01kr6h63sderby6y2y99fhkgry', // Replace with actual monthly product ID when created
-  yearly: 'pro_01kr6h63sderby6y2y99fhkgry', // Replace with actual yearly product ID when created
+  monthly: 'pro_01kr6jxc5x77f09pskgv5xmm95',
+  yearly: 'pro_01kr6jyegkfejk14rbrdq8hqra',
 };
 
 export default function Pricing() {
