@@ -131,29 +131,23 @@ export default function Pricing() {
           throw error;
         }
       },
-      onApprove: async (data: any, actions: any) => {
+      onApprove: async (data: any) => {
         try {
           setLoading(true);
-          const details = await actions.order.capture();
+          const orderResponse = await fetch(API_URLS.paypalCapture, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              paypalOrderId: data.orderID,
+            }),
+          });
 
-          if (details.status === 'COMPLETED' || details.status === 'APPROVED') {
-            const orderResponse = await fetch(API_URLS.paypalCapture, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                paypalOrderId: data.orderID,
-              }),
-            });
-
-            const orderResult = await orderResponse.json();
-            if (orderResult.success) {
-              alert('Payment successful! Thank you for your purchase.');
-              navigate('/');
-            } else {
-              alert('Payment processed but verification failed. Please contact support.');
-            }
+          const orderResult = await orderResponse.json();
+          if (orderResult.success) {
+            alert('Payment successful! Thank you for your purchase.');
+            navigate('/');
           } else {
-            alert('Payment not completed. Please try again.');
+            alert('Payment failed: ' + (orderResult.error || 'Unknown error'));
           }
         } catch (error) {
           console.error('PayPal capture error:', error);
