@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   en: {
     translation: {
-      brand: 'DestinyMap',
+      brand: 'BaziReading',
       tagline: 'Discover Your Chinese Astrology',
       subtitle: 'Unlock the ancient wisdom of Bazi to understand your personality, relationships, and life path',
       cta: {
@@ -91,7 +91,7 @@ const resources = {
   },
   es: {
     translation: {
-      brand: 'DestinyMap',
+      brand: 'BaziReading',
       tagline: 'Descubre tu Astrología China',
       subtitle: 'Desbloquea la sabiduría ancestral del Bazi para comprender tu personalidad, relaciones y camino de vida',
       cta: {
@@ -177,7 +177,7 @@ const resources = {
   },
   fr: {
     translation: {
-      brand: 'DestinyMap',
+      brand: 'BaziReading',
       tagline: 'Découvrez votre Astrologie Chinoise',
       subtitle: 'Débloquez la sagesse ancestrale du Bazi pour comprendre votre personnalité, vos relations et votre chemin de vie',
       cta: {
@@ -263,7 +263,7 @@ const resources = {
   },
   de: {
     translation: {
-      brand: 'DestinyMap',
+      brand: 'BaziReading',
       tagline: 'Entdecken Sie Ihre Chinesische Astrologie',
       subtitle: 'Erschließen Sie die uralte Weisheit des Bazi, um Ihre Persönlichkeit, Beziehungen und Lebensweg zu verstehen',
       cta: {

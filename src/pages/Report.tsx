@@ -40,8 +40,8 @@ function BrandWatermark() {
   return (
     <div className="flex items-center justify-center py-3 border-t border-[#D4A853]/20 mt-4">
       <YinYangSVG size={20} className="text-[#D4A853] mr-2" />
-      <span className="text-sm font-semibold text-[#D4A853]" style={{ fontFamily: 'Cinzel, serif' }}>DestinyMap</span>
-      <span className="text-xs text-[#F5F0E8]/40 ml-2">destinymap.com</span>
+      <span className="text-sm font-semibold text-[#D4A853]" style={{ fontFamily: 'Cinzel, serif' }}>BaziReading</span>
+      <span className="text-xs text-[#F5F0E8]/40 ml-2">bazireading.vercel.app</span>
     </div>
   );
 }
@@ -55,7 +55,7 @@ function ShareCTA() {
       </p>
       <div className="flex items-center justify-center space-x-2 text-xs text-[#D4A853]">
         <ExternalLink className="w-3 h-3" />
-        <span>Visit destinymap.com for your free Bazi reading</span>
+        <span>Visit bazireading.vercel.app for your free Bazi reading</span>
       </div>
     </div>
   );
@@ -134,7 +134,7 @@ export default function Report() {
       ctx.font = 'bold 32px Cinzel, serif';
       ctx.fillStyle = '#D4A853';
       ctx.textAlign = 'center';
-      ctx.fillText('DestinyMap', 400, y);
+      ctx.fillText('BaziReading', 400, y);
       y += 30;
       ctx.font = '16px Outfit, sans-serif';
       ctx.fillStyle = '#F5F0E8';
@@ -262,11 +262,11 @@ export default function Report() {
 
       ctx.font = 'bold 16px Cinzel, serif';
       ctx.fillStyle = '#D4A853';
-      ctx.fillText('DestinyMap', 400, y);
+      ctx.fillText('BaziReading', 400, y);
       y += 18;
       ctx.font = '11px Outfit, sans-serif';
       ctx.fillStyle = '#F5F0E8';
-      ctx.fillText('Discover Your Chinese Astrology at destinymap.com', 400, y);
+      ctx.fillText('Discover Your Chinese Astrology at bazireading.vercel.app', 400, y);
       y += 15;
       ctx.font = '9px Outfit, sans-serif';
       ctx.fillStyle = '#F5F0E8';
@@ -275,7 +275,7 @@ export default function Report() {
       ctx.globalAlpha = 1;
 
       const link = document.createElement('a');
-      link.download = `DestinyMap-Bazi-${currentChart?.userName || 'Reading'}.png`;
+      link.download = `BaziReading-${currentChart?.userName || 'Reading'}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (error) { console.error('Error:', error); }
