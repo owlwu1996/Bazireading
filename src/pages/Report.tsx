@@ -64,11 +64,12 @@ function ShareCTA() {
 export default function Report() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { currentChart, setCurrentReading } = useStore();
+  const { currentChart, setCurrentReading, isPaid, setIsPaid } = useStore();
   const [reading, setReading] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<number>>(new Set([0, 1]));
   const [savingImage, setSavingImage] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -388,8 +389,8 @@ export default function Report() {
                     <Camera className="w-3.5 h-3.5 mr-1.5" />
                     {savingImage ? 'Saving...' : 'Save Image'}
                   </button>
-                  {reading.type === 'basic' && (
-                    <button onClick={() => generateReading('full')}
+                  {reading.type === 'basic' && !isPaid && (
+                    <button onClick={() => setShowPaymentModal(true)}
                       className="flex items-center px-3 py-1.5 bg-gradient-to-r from-[#D4A853] to-[#B87333] text-[#0F0F0F] font-semibold rounded-lg hover:shadow-[0_0_20px_rgba(212,168,83,0.3)] transition-all text-sm">
                       <Lock className="w-3.5 h-3.5 mr-1.5" /> Unlock Full
                     </button>
@@ -443,6 +444,31 @@ export default function Report() {
           <p className="text-[10px] text-[#F5F0E8]/40">{t('report.disclaimer')}</p>
         </div>
       </div>
+
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1a1a1a] border border-[#D4A853]/30 rounded-xl p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold text-[#D4A853] mb-4 text-center">Unlock Full Report</h3>
+            <p className="text-[#F5F0E8]/70 text-sm mb-6 text-center">
+              Get complete access to all sections of your Bazi reading including personality, love, career, and annual forecasts.
+            </p>
+            <div className="space-y-3">
+              <button
+                onClick={() => { setShowPaymentModal(false); navigate('/pricing'); }}
+                className="w-full py-3 bg-gradient-to-r from-[#D4A853] to-[#B87333] text-[#0F0F0F] font-semibold rounded-lg hover:shadow-[0_0_20px_rgba(212,168,83,0.3)] transition-all"
+              >
+                Go to Pricing
+              </button>
+              <button
+                onClick={() => setShowPaymentModal(false)}
+                className="w-full py-3 bg-[#0F0F0F] border border-[#D4A853]/30 text-[#F5F0E8]/60 rounded-lg hover:bg-[#D4A853]/10 transition-all"
+              >
+                Maybe Later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

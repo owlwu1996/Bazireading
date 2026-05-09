@@ -51,10 +51,12 @@ interface AppState {
   currentReading: ReadingReport | null;
   isLoading: boolean;
   language: string;
+  isPaid: boolean;
   setCurrentChart: (chart: BaziChart | null) => void;
   setCurrentReading: (reading: ReadingReport | null) => void;
   setIsLoading: (loading: boolean) => void;
   setLanguage: (lang: string) => void;
+  setIsPaid: (paid: boolean) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -62,8 +64,10 @@ export const useStore = create<AppState>((set) => ({
   currentReading: null,
   isLoading: false,
   language: 'en',
+  isPaid: false,
   setCurrentChart: (chart) => set({ currentChart: chart }),
   setCurrentReading: (reading) => set({ currentReading: reading }),
   setIsLoading: (loading) => set({ isLoading: loading }),
   setLanguage: (lang) => set({ language: lang }),
+  setIsPaid: (paid) => set({ isPaid: paid }),
 }));
