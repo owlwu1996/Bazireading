@@ -87,10 +87,22 @@ export default function Pricing() {
       return;
     }
 
+    const clientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
+    if (!clientId || clientId === 'test') {
+      console.error('PayPal Client ID not configured');
+      paypalRef.current.innerHTML = '<p class="text-red-400 text-sm">PayPal configuration error. Please contact support.</p>';
+      return;
+    }
+
     const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${import.meta.env.VITE_PAYPAL_CLIENT_ID || 'test'}&currency=USD`;
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD&intent=capture`;
     script.async = true;
     script.onload = renderPayPalButton;
+    script.onerror = () => {
+      if (paypalRef.current) {
+        paypalRef.current.innerHTML = '<p class="text-red-400 text-sm">Failed to load PayPal. Please try again later.</p>';
+      }
+    };
     document.body.appendChild(script);
   };
 
@@ -121,26 +133,27 @@ export default function Pricing() {
       },
       onApprove: async (data: any, actions: any) => {
         try {
-          const orderResponse = await fetch(API_URLS.paypalCapture, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              paypalOrderId: data.orderID,
-            }),
-          });
-
-          const orderResult = await orderResponse.json();
-          if (!orderResult.success) {
-            throw new Error('Backend capture failed');
-          }
-
+          setLoading(true);
           const details = await actions.order.capture();
 
-          if (details.status === 'COMPLETED') {
-            alert('Payment successful! Thank you for your purchase.');
-            navigate('/');
+          if (details.status === 'COMPLETED' || details.status === 'APPROVED') {
+            const orderResponse = await fetch(API_URLS.paypalCapture, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                paypalOrderId: data.orderID,
+              }),
+            });
+
+            const orderResult = await orderResponse.json();
+            if (orderResult.success) {
+              alert('Payment successful! Thank you for your purchase.');
+              navigate('/');
+            } else {
+              alert('Payment processed but verification failed. Please contact support.');
+            }
           } else {
-            alert('Payment failed. Please try again.');
+            alert('Payment not completed. Please try again.');
           }
         } catch (error) {
           console.error('PayPal capture error:', error);
