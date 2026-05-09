@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, ArrowLeft, Info, UserCircle } from 'lucide-react';
 import { useStore } from '../store';
+import { API_URLS } from '../lib/api';
 import BaguaLoader from '../components/BaguaLoader';
 
 export default function BaziInput() {
@@ -41,7 +42,7 @@ export default function BaziInput() {
     const startTime = Date.now();
 
     try {
-      const response = await fetch('http://localhost:3001/api/bazi/calculate', {
+      const response = await fetch(API_URLS.baziCalculate, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, User, Scale, Heart, Briefcase, Calendar, TrendingUp, Lock, ArrowLeft, Loader2, Camera, ExternalLink } from 'lucide-react';
 import { useStore } from '../store';
+import { API_URLS } from '../lib/api';
 
 const iconMap: Record<string, React.ElementType> = {
   User, Scale, Heart, Briefcase, Calendar, TrendingUp,
@@ -79,7 +80,7 @@ export default function Report() {
     if (!currentChart) return;
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/bazi/reading', {
+      const response = await fetch(API_URLS.baziReading, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ baziId: currentChart.dbId || 1, type }),
       });

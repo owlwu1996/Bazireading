@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Heart, ArrowLeft, Sparkles, Loader2 } from 'lucide-react';
+import { API_URLS } from '../lib/api';
 
 export default function Compatibility() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export default function Compatibility() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/bazi/compatibility', {
+      const response = await fetch(API_URLS.baziCompatibility, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ personA, personB }),

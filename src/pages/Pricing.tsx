@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, Check, ArrowLeft, CreditCard, Wallet } from 'lucide-react';
 import { useState } from 'react';
+import { API_URLS } from '../lib/api';
 
 export default function Pricing() {
   const navigate = useNavigate();
@@ -65,7 +66,7 @@ export default function Pricing() {
     if (!selectedPlan) return;
 
     try {
-      const response = await fetch('http://localhost:3001/api/payment/create-intent', {
+      const response = await fetch(API_URLS.paymentCreateIntent, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan: selectedPlan, paymentMethod }),
@@ -74,7 +75,7 @@ export default function Pricing() {
       const data = await response.json();
 
       if (data.orderId) {
-        await fetch('http://localhost:3001/api/payment/confirm', {
+        await fetch(API_URLS.paymentConfirm, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ orderId: data.orderId }),
