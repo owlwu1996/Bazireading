@@ -41,7 +41,7 @@ function BrandWatermark() {
     <div className="flex items-center justify-center py-3 border-t border-[#D4A853]/20 mt-4">
       <YinYangSVG size={20} className="text-[#D4A853] mr-2" />
       <span className="text-sm font-semibold text-[#D4A853]" style={{ fontFamily: 'Cinzel, serif' }}>BaziReading</span>
-      <span className="text-xs text-[#F5F0E8]/40 ml-2">bazireading.vercel.app</span>
+      <span className="text-xs text-[#F5F0E8]/40 ml-2">bazireading.cc</span>
     </div>
   );
 }
@@ -55,7 +55,7 @@ function ShareCTA() {
       </p>
       <div className="flex items-center justify-center space-x-2 text-xs text-[#D4A853]">
         <ExternalLink className="w-3 h-3" />
-        <span>Visit bazireading.vercel.app for your free Bazi reading</span>
+        <span>Visit bazireading.cc for your free Bazi reading</span>
       </div>
     </div>
   );
@@ -267,7 +267,7 @@ export default function Report() {
       y += 18;
       ctx.font = '11px Outfit, sans-serif';
       ctx.fillStyle = '#F5F0E8';
-      ctx.fillText('Discover Your Chinese Astrology at bazireading.vercel.app', 400, y);
+      ctx.fillText('Discover Your Chinese Astrology at bazireading.cc', 400, y);
       y += 15;
       ctx.font = '9px Outfit, sans-serif';
       ctx.fillStyle = '#F5F0E8';

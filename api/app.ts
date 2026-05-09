@@ -8,6 +8,8 @@ import paddleRoutes from './routes/paddle';
 const app = express();
 
 const allowedOrigins = [
+  'https://bazireading.cc',
+  'https://www.bazireading.cc',
   'https://bazireading.vercel.app',
   'https://bazireading-git-master-owlwu1996.vercel.app',
   'http://localhost:5173',
