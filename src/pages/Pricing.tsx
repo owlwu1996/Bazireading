@@ -9,8 +9,8 @@ declare global {
   }
 }
 
-const PADDLE_CLIENT_TOKEN = 'test_7d279f1a349e22d30de1c93bf2c9e'; // Paddle sandbox client-side token
-const PADDLE_ENVIRONMENT = 'sandbox'; // Change to 'production' when live
+const PADDLE_CLIENT_TOKEN = 'live_d508723174a59bc2d7d3bcffdeb'; // Paddle production client-side token
+const PADDLE_ENVIRONMENT = 'production';
 
 // Price IDs from Paddle Dashboard
 const PADDLE_PRODUCTS = {
