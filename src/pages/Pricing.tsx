@@ -12,11 +12,11 @@ declare global {
 const PADDLE_CLIENT_TOKEN = 'test_7d279f1a349e22d30de1c93bf2c9e'; // Paddle sandbox client-side token
 const PADDLE_ENVIRONMENT = 'sandbox'; // Change to 'production' when live
 
-// Product IDs from Paddle Dashboard
+// Price IDs from Paddle Dashboard
 const PADDLE_PRODUCTS = {
-  single: 'pro_01kr6h63sderby6y2y99fhkgry',
-  monthly: 'pro_01kr6jxc5x77f09pskgv5xmm95',
-  yearly: 'pro_01kr6jyegkfejk14rbrdq8hqra',
+  single: 'pri_01kr6k3s116za2v798hdjb3csn',
+  monthly: 'pri_01kr6k2rt7tg9w5yvy8psnakep',
+  yearly: 'pri_01kr6k0mc4d5kxzw8yn2esa4qn',
 };
 
 export default function Pricing() {
