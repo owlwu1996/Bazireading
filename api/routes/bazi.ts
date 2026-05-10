@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { calculateBazi } from '../services/baziCalculation';
 import { generateReading, generateCompatibilityReading } from '../services/readingGeneration';
 import db from '../database';
-import jwt from 'jsonwebtoken';
+import { verifyToken } from './auth';
 
 const router = Router();
 
@@ -21,8 +21,10 @@ router.post('/calculate', (req, res) => {
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'bazi-reading-secret-key');
-        userId = decoded.userId;
+        const decoded = verifyToken(token);
+        if (decoded) {
+          userId = decoded.userId;
+        }
       }
     } catch (err) {
       console.log('No valid auth token, saving chart without user');
@@ -152,7 +154,10 @@ router.get('/history', (req, res) => {
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'bazi-reading-secret-key');
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
     const userId = decoded.userId;
 
     const chartsStmt = db.prepare(`
