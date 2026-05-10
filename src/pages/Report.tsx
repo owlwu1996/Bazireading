@@ -64,7 +64,7 @@ function ShareCTA() {
 export default function Report() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { currentChart, setCurrentReading, isPaid, setIsPaid } = useStore();
+  const { currentChart, currentReading, setCurrentReading, isPaid, setIsPaid } = useStore();
   const [reading, setReading] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<number>>(new Set([0, 1]));
@@ -74,8 +74,12 @@ export default function Report() {
 
   useEffect(() => {
     if (!currentChart) { navigate('/input'); return; }
-    generateReading('basic');
-  }, [currentChart]);
+    if (currentReading && currentReading.sections) {
+      setReading(currentReading);
+    } else {
+      generateReading('basic');
+    }
+  }, [currentChart, currentReading]);
 
   const generateReading = async (type: 'basic' | 'full') => {
     if (!currentChart) return;
