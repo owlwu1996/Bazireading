@@ -4,6 +4,8 @@ import path from 'path';
 const dbPath = process.env.DATABASE_PATH || path.resolve(process.cwd(), 'data', 'destinymap.db');
 const db = new Database(dbPath);
 
+db.pragma('journal_mode = WAL');
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,7 +31,7 @@ db.exec(`
     day_master TEXT NOT NULL,
     life_cycles TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
   );
 
   CREATE TABLE IF NOT EXISTS readings (
@@ -41,7 +43,7 @@ db.exec(`
     is_paid BOOLEAN DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (bazi_id) REFERENCES bazi_charts(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
   );
 
   CREATE TABLE IF NOT EXISTS orders (
@@ -55,7 +57,7 @@ db.exec(`
     payment_id TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     paid_at DATETIME,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
   );
 
   CREATE TABLE IF NOT EXISTS compatibilities (
@@ -69,17 +71,17 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (bazi_a_id) REFERENCES bazi_charts(id),
     FOREIGN KEY (bazi_b_id) REFERENCES bazi_charts(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
   );
 
   CREATE TABLE IF NOT EXISTS subscriptions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER UNIQUE NOT NULL,
+    user_id INTEGER NOT NULL,
     plan_type TEXT NOT NULL,
     status TEXT DEFAULT 'active',
     starts_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     expires_at DATETIME,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
 `);
 
