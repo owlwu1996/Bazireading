@@ -59,7 +59,7 @@ router.post('/capture', async (req, res) => {
       const orderStmt = db.prepare('SELECT * FROM orders WHERE payment_id = ?');
       const order = orderStmt.get(paypalOrderId) as any;
 
-      if (order) {
+      if (order && order.user_id && order.user_id > 0) {
         const updateStmt = db.prepare(`
           UPDATE orders SET status = 'completed', paid_at = CURRENT_TIMESTAMP
           WHERE id = ?
@@ -78,7 +78,7 @@ router.post('/capture', async (req, res) => {
             INSERT OR REPLACE INTO subscriptions (user_id, plan_type, status, expires_at)
             VALUES (?, ?, 'active', ?)
           `);
-          subStmt.run(order.user_id || 0, order.plan_type, expiresAt.toISOString());
+          subStmt.run(order.user_id, order.plan_type, expiresAt.toISOString());
         }
       }
 
