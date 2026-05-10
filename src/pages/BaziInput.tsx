@@ -9,7 +9,7 @@ import BaguaLoader from '../components/BaguaLoader';
 export default function BaziInput() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { setCurrentChart, setIsLoading, isLoading, user } = useStore();
+  const { setCurrentChart, setIsLoading, isLoading, user, authToken } = useStore();
   const isAuthenticated = !!user;
 
   const [formData, setFormData] = useState({
@@ -50,9 +50,14 @@ export default function BaziInput() {
     const startTime = Date.now();
 
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+
       const response = await fetch(API_URLS.baziCalculate, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           birthDate,
           birthTime: formData.birthTime || '12:00',
