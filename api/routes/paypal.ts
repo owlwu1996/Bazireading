@@ -12,7 +12,7 @@ const PLANS = {
 
 router.post('/create-order', async (req, res) => {
   try {
-    const { plan, userId } = req.body;
+    const { plan } = req.body;
 
     if (!PLANS[plan as keyof typeof PLANS]) {
       return res.status(400).json({ error: 'Invalid plan' });
@@ -21,39 +21,10 @@ router.post('/create-order', async (req, res) => {
     const planInfo = PLANS[plan as keyof typeof PLANS];
     const paypalOrder = await createOrder(planInfo.amount, 'USD');
 
-    let result: any;
-    
-    if (userId && userId > 0) {
-      const stmt = db.prepare(`
-        INSERT INTO orders (user_id, plan_type, amount, currency, status, payment_method, payment_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `);
-      result = stmt.run(
-        userId,
-        plan,
-        planInfo.amount,
-        'USD',
-        'pending',
-        'paypal',
-        paypalOrder.id
-      );
-    } else {
-      const stmt = db.prepare(`
-        INSERT INTO orders (plan_type, amount, currency, status, payment_method, payment_id)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `);
-      result = stmt.run(
-        plan,
-        planInfo.amount,
-        'USD',
-        'pending',
-        'paypal',
-        paypalOrder.id
-      );
-    }
+    const orderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     res.json({
-      orderId: result.lastInsertRowid,
+      orderId,
       paypalOrderId: paypalOrder.id,
       amount: planInfo.amount,
       currency: 'USD',
@@ -66,69 +37,18 @@ router.post('/create-order', async (req, res) => {
 
 router.post('/capture', async (req, res) => {
   try {
-    const { paypalOrderId, userId } = req.body;
+    const { paypalOrderId } = req.body;
 
     const captureResult = await captureOrder(paypalOrderId);
 
     if (captureResult.status === 'COMPLETED') {
-      const orderStmt = db.prepare('SELECT * FROM orders WHERE payment_id = ?');
-      const order = orderStmt.get(paypalOrderId) as any;
-
-      if (order) {
-        const updateStmt = db.prepare(`
-          UPDATE orders SET status = 'completed', paid_at = CURRENT_TIMESTAMP
-          WHERE id = ?
-        `);
-        updateStmt.run(order.id);
-
-        if (userId && userId > 0) {
-          const linkStmt = db.prepare(`
-            UPDATE orders SET user_id = ? WHERE id = ? AND user_id IS NULL
-          `);
-          linkStmt.run(userId, order.id);
-
-          if (order.plan_type === 'monthly' || order.plan_type === 'yearly') {
-            const expiresAt = new Date();
-            if (order.plan_type === 'monthly') {
-              expiresAt.setMonth(expiresAt.getMonth() + 1);
-            } else {
-              expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-            }
-
-            const subStmt = db.prepare(`
-              INSERT OR REPLACE INTO subscriptions (user_id, plan_type, status, expires_at)
-              VALUES (?, ?, 'active', ?)
-            `);
-            subStmt.run(userId, order.plan_type, expiresAt.toISOString());
-          }
-        }
-      }
-
-      res.json({ success: true, message: 'Payment completed', orderId: order?.id });
+      res.json({ success: true, message: 'Payment completed' });
     } else {
       res.status(400).json({ error: 'Payment not completed', status: captureResult.status });
     }
   } catch (error) {
     console.error('PayPal capture error:', error);
     res.status(500).json({ error: 'Failed to capture payment' });
-  }
-});
-
-router.post('/link-order', (req, res) => {
-  try {
-    const { orderId, userId } = req.body;
-
-    if (!orderId || !userId) {
-      return res.status(400).json({ error: 'Order ID and User ID are required' });
-    }
-
-    const stmt = db.prepare('UPDATE orders SET user_id = ? WHERE id = ?');
-    stmt.run(userId, orderId);
-
-    res.json({ success: true, message: 'Order linked to user' });
-  } catch (error) {
-    console.error('Link order error:', error);
-    res.status(500).json({ error: 'Failed to link order' });
   }
 });
 
