@@ -19,23 +19,38 @@ router.post('/create-order', async (req, res) => {
     }
 
     const planInfo = PLANS[plan as keyof typeof PLANS];
-
     const paypalOrder = await createOrder(planInfo.amount, 'USD');
 
-    const stmt = db.prepare(`
-      INSERT INTO orders (user_id, plan_type, amount, currency, status, payment_method, payment_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    const result = stmt.run(
-      userId || null,
-      plan,
-      planInfo.amount,
-      'USD',
-      'pending',
-      'paypal',
-      paypalOrder.id
-    );
+    let result: any;
+    
+    if (userId && userId > 0) {
+      const stmt = db.prepare(`
+        INSERT INTO orders (user_id, plan_type, amount, currency, status, payment_method, payment_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `);
+      result = stmt.run(
+        userId,
+        plan,
+        planInfo.amount,
+        'USD',
+        'pending',
+        'paypal',
+        paypalOrder.id
+      );
+    } else {
+      const stmt = db.prepare(`
+        INSERT INTO orders (plan_type, amount, currency, status, payment_method, payment_id)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `);
+      result = stmt.run(
+        plan,
+        planInfo.amount,
+        'USD',
+        'pending',
+        'paypal',
+        paypalOrder.id
+      );
+    }
 
     res.json({
       orderId: result.lastInsertRowid,
@@ -68,7 +83,7 @@ router.post('/capture', async (req, res) => {
 
         if (userId && userId > 0) {
           const linkStmt = db.prepare(`
-            UPDATE orders SET user_id = ? WHERE id = ?
+            UPDATE orders SET user_id = ? WHERE id = ? AND user_id IS NULL
           `);
           linkStmt.run(userId, order.id);
 
