@@ -9,6 +9,7 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Refund from './pages/Refund';
 import Auth from './pages/Auth';
+import Account from './pages/Account';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/refund" element={<Refund />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/account" element={<Account />} />
       </Routes>
     </BrowserRouter>
   );

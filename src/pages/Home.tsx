@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Sparkles, Heart, Briefcase, Calendar, ChevronRight, Globe } from 'lucide-react';
+import { Sparkles, Heart, Briefcase, Calendar, ChevronRight, Globe, User, LogOut } from 'lucide-react';
 import { useStore } from '../store';
+import { useEffect } from 'react';
 
 function YinYangSVG({ size = 40, className = '' }: { size?: number; className?: string }) {
   return (
@@ -55,7 +56,26 @@ function BaguaSVG({ size = 120, className = '' }: { size?: number; className?: s
 export default function Home() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const { setLanguage } = useStore();
+  const { setLanguage, user, authToken, setUser, setAuthToken, setIsPaid, setIsSubscribed, logout } = useStore();
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    const userData = localStorage.getItem('user');
+    const isPaid = localStorage.getItem('isPaid') === 'true';
+    const isSubscribed = localStorage.getItem('isSubscribed') === 'true';
+
+    if (token && userData) {
+      setAuthToken(token);
+      setUser(JSON.parse(userData));
+      setIsPaid(isPaid);
+      setIsSubscribed(isSubscribed);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const languages = [
     { code: 'en', label: 'English' },
@@ -148,6 +168,31 @@ export default function Home() {
                   ))}
                 </div>
               </div>
+              {user ? (
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => navigate('/account')}
+                    className="flex items-center space-x-1 text-sm text-[#F5F0E8]/70 hover:text-[#D4A853] transition-colors"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Account</span>
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-1 text-sm text-[#F5F0E8]/70 hover:text-red-400 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => navigate('/auth')}
+                  className="flex items-center space-x-1 text-sm text-[#F5F0E8]/70 hover:text-[#D4A853] transition-colors"
+                >
+                  <User className="w-4 h-4" />
+                  <span>Sign In</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
