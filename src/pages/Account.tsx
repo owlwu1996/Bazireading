@@ -21,7 +21,7 @@ interface HistoryItem {
 export default function Account() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { user, authToken, logout, setCurrentChart } = useStore();
+  const { user, authToken, logout, setCurrentChart, setCurrentReading } = useStore();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,17 +59,31 @@ export default function Account() {
 
   const handleViewReport = async (item: HistoryItem) => {
     try {
-      const response = await fetch(API_URLS.baziChart(item.id), {
+      const chartResponse = await fetch(API_URLS.baziChart(item.id), {
         headers: {
           'Authorization': `Bearer ${authToken}`,
         },
       });
-      const chart = await response.json();
+      const chart = await chartResponse.json();
+
       setCurrentChart({
         ...chart,
         dbId: item.id,
         userName: user?.name || 'User',
       });
+
+      if (item.readingId && item.readingSections) {
+        setCurrentReading({
+          id: item.readingId.toString(),
+          baziId: item.id.toString(),
+          type: item.readingType || 'basic',
+          sections: item.readingSections,
+          createdAt: item.readingDate || item.createdAt,
+        });
+      } else {
+        setCurrentReading(null);
+      }
+
       navigate('/report');
     } catch (error) {
       console.error('Failed to load chart:', error);

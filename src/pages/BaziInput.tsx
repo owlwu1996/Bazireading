@@ -9,7 +9,7 @@ import BaguaLoader from '../components/BaguaLoader';
 export default function BaziInput() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { setCurrentChart, setIsLoading, isLoading, user, authToken } = useStore();
+  const { setCurrentChart, setCurrentReading, setIsLoading, isLoading, user, authToken } = useStore();
   const isAuthenticated = !!user;
 
   const [formData, setFormData] = useState({
@@ -70,6 +70,18 @@ export default function BaziInput() {
       const data = await response.json();
       data.userName = formData.name;
       setCurrentChart(data);
+
+      const readingResponse = await fetch(API_URLS.baziReading, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          baziId: data.dbId,
+          type: 'basic',
+        }),
+      });
+
+      const readingData = await readingResponse.json();
+      setCurrentReading(readingData);
 
       const elapsed = Date.now() - startTime;
       const minDelay = 2000;
