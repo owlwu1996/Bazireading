@@ -33,7 +33,7 @@ export default function Account() {
 
     const fetchHistory = async () => {
       try {
-        const response = await fetch(`${API_URLS.bazi}/history`, {
+        const response = await fetch(API_URLS.baziHistory, {
           headers: {
             'Authorization': `Bearer ${authToken}`,
           },
@@ -59,7 +59,7 @@ export default function Account() {
 
   const handleViewReport = async (item: HistoryItem) => {
     try {
-      const response = await fetch(`${API_URLS.bazi}/chart/${item.id}`, {
+      const response = await fetch(API_URLS.baziChart(item.id), {
         headers: {
           'Authorization': `Bearer ${authToken}`,
         },

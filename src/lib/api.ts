@@ -1,6 +1,9 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export const API_URLS = {
+  bazi: `${API_BASE}/api/bazi`,
+  baziHistory: `${API_BASE}/api/bazi/history`,
+  baziChart: (id: number) => `${API_BASE}/api/bazi/chart/${id}`,
   baziCalculate: `${API_BASE}/api/bazi/calculate`,
   baziReading: `${API_BASE}/api/bazi/reading`,
   baziCompatibility: `${API_BASE}/api/bazi/compatibility`,
