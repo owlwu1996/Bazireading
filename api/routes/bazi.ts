@@ -16,14 +16,21 @@ router.post('/calculate', (req, res) => {
 
     const chart = calculateBazi(birthDate, birthTime || '12:00', gender);
 
-    let userId = null;
+    let userId: number | null = null;
     try {
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
         const decoded = verifyToken(token);
         if (decoded) {
-          userId = decoded.userId;
+          try {
+            const userCheck = db.prepare('SELECT id FROM users WHERE id = ?').get(decoded.userId);
+            if (userCheck) {
+              userId = decoded.userId;
+            }
+          } catch (dbErr) {
+            console.log('User check failed, saving without user association');
+          }
         }
       }
     } catch (err) {
@@ -35,18 +42,24 @@ router.post('/calculate', (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    const result = stmt.run(
-      userId,
-      birthDate,
-      birthTime || '12:00',
-      birthCity || '',
-      gender,
-      JSON.stringify(chart.fourPillars),
-      JSON.stringify(chart.fiveElements),
-      JSON.stringify(chart.tenGods),
-      JSON.stringify(chart.dayMaster),
-      JSON.stringify(chart.lifeCycles)
-    );
+    let result: any;
+    try {
+      result = stmt.run(
+        userId,
+        birthDate,
+        birthTime || '12:00',
+        birthCity || '',
+        gender,
+        JSON.stringify(chart.fourPillars),
+        JSON.stringify(chart.fiveElements),
+        JSON.stringify(chart.tenGods),
+        JSON.stringify(chart.dayMaster),
+        JSON.stringify(chart.lifeCycles)
+      );
+    } catch (insertErr: any) {
+      console.error('Insert error:', insertErr);
+      return res.status(500).json({ error: 'Failed to save chart: ' + insertErr.message });
+    }
 
     res.json({
       ...chart,
