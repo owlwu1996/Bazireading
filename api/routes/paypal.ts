@@ -12,7 +12,7 @@ const PLANS = {
 
 router.post('/create-order', async (req, res) => {
   try {
-    const { plan } = req.body;
+    const { plan, userId } = req.body;
 
     if (!PLANS[plan as keyof typeof PLANS]) {
       return res.status(400).json({ error: 'Invalid plan' });
@@ -28,7 +28,7 @@ router.post('/create-order', async (req, res) => {
     `);
 
     const result = stmt.run(
-      null,
+      userId || null,
       plan,
       planInfo.amount,
       'USD',
@@ -51,7 +51,7 @@ router.post('/create-order', async (req, res) => {
 
 router.post('/capture', async (req, res) => {
   try {
-    const { paypalOrderId } = req.body;
+    const { paypalOrderId, userId } = req.body;
 
     const captureResult = await captureOrder(paypalOrderId);
 
@@ -59,36 +59,61 @@ router.post('/capture', async (req, res) => {
       const orderStmt = db.prepare('SELECT * FROM orders WHERE payment_id = ?');
       const order = orderStmt.get(paypalOrderId) as any;
 
-      if (order && order.user_id && order.user_id > 0) {
+      if (order) {
         const updateStmt = db.prepare(`
           UPDATE orders SET status = 'completed', paid_at = CURRENT_TIMESTAMP
           WHERE id = ?
         `);
         updateStmt.run(order.id);
 
-        if (order.plan_type === 'monthly' || order.plan_type === 'yearly') {
-          const expiresAt = new Date();
-          if (order.plan_type === 'monthly') {
-            expiresAt.setMonth(expiresAt.getMonth() + 1);
-          } else {
-            expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-          }
-
-          const subStmt = db.prepare(`
-            INSERT OR REPLACE INTO subscriptions (user_id, plan_type, status, expires_at)
-            VALUES (?, ?, 'active', ?)
+        if (userId && userId > 0) {
+          const linkStmt = db.prepare(`
+            UPDATE orders SET user_id = ? WHERE id = ?
           `);
-          subStmt.run(order.user_id, order.plan_type, expiresAt.toISOString());
+          linkStmt.run(userId, order.id);
+
+          if (order.plan_type === 'monthly' || order.plan_type === 'yearly') {
+            const expiresAt = new Date();
+            if (order.plan_type === 'monthly') {
+              expiresAt.setMonth(expiresAt.getMonth() + 1);
+            } else {
+              expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+            }
+
+            const subStmt = db.prepare(`
+              INSERT OR REPLACE INTO subscriptions (user_id, plan_type, status, expires_at)
+              VALUES (?, ?, 'active', ?)
+            `);
+            subStmt.run(userId, order.plan_type, expiresAt.toISOString());
+          }
         }
       }
 
-      res.json({ success: true, message: 'Payment completed' });
+      res.json({ success: true, message: 'Payment completed', orderId: order?.id });
     } else {
       res.status(400).json({ error: 'Payment not completed', status: captureResult.status });
     }
   } catch (error) {
     console.error('PayPal capture error:', error);
     res.status(500).json({ error: 'Failed to capture payment' });
+  }
+});
+
+router.post('/link-order', (req, res) => {
+  try {
+    const { orderId, userId } = req.body;
+
+    if (!orderId || !userId) {
+      return res.status(400).json({ error: 'Order ID and User ID are required' });
+    }
+
+    const stmt = db.prepare('UPDATE orders SET user_id = ? WHERE id = ?');
+    stmt.run(userId, orderId);
+
+    res.json({ success: true, message: 'Order linked to user' });
+  } catch (error) {
+    console.error('Link order error:', error);
+    res.status(500).json({ error: 'Failed to link order' });
   }
 });
 

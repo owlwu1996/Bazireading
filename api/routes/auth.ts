@@ -1,33 +1,211 @@
-/**
- * This is a user authentication API route demo.
- * Handle user registration, login, token management, etc.
- */
-import { Router, type Request, type Response } from 'express'
+import { Router } from 'express';
+import crypto from 'crypto';
+import db from '../database';
 
-const router = Router()
+const router = Router();
 
-/**
- * User Login
- * POST /api/auth/register
- */
-router.post('/register', async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement register logic
-})
+const JWT_SECRET = process.env.JWT_SECRET || 'bazireading-secret-key-2024';
+const JWT_EXPIRES_IN = '7d';
 
-/**
- * User Login
- * POST /api/auth/login
- */
-router.post('/login', async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement login logic
-})
+function hashPassword(password: string, salt: string): string {
+  return crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
+}
 
-/**
- * User Logout
- * POST /api/auth/logout
- */
-router.post('/logout', async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement logout logic
-})
+function generateToken(userId: number, email: string): string {
+  const payload = { userId, email, iat: Math.floor(Date.now() / 1000) };
+  const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64');
+  const signature = crypto.createHmac('sha256', JWT_SECRET).update(base64Payload).digest('hex');
+  return `${base64Payload}.${signature}`;
+}
 
-export default router
+function verifyToken(token: string): { userId: number; email: string } | null {
+  try {
+    const [base64Payload, signature] = token.split('.');
+    const expectedSignature = crypto.createHmac('sha256', JWT_SECRET).update(base64Payload).digest('hex');
+    if (signature !== expectedSignature) return null;
+    
+    const payload = JSON.parse(Buffer.from(base64Payload, 'base64').toString());
+    const expTime = payload.iat + 7 * 24 * 60 * 60;
+    if (Math.floor(Date.now() / 1000) > expTime) return null;
+    
+    return { userId: payload.userId, email: payload.email };
+  } catch {
+    return null;
+  }
+}
+
+router.post('/register', (req, res) => {
+  try {
+    const { email, password, name } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    const existingUser = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already registered' });
+    }
+
+    const salt = crypto.randomBytes(32).toString('hex');
+    const passwordHash = hashPassword(password, salt);
+
+    const stmt = db.prepare(`
+      INSERT INTO users (email, password_hash, name)
+      VALUES (?, ?, ?)
+    `);
+    const result = stmt.run(email, `${salt}:${passwordHash}`, name || null);
+
+    const token = generateToken(result.lastInsertRowid as number, email);
+
+    const userOrders = db.prepare('SELECT * FROM orders WHERE user_id = ?').all(result.lastInsertRowid);
+    const hasActiveSubscription = userOrders.some((order: any) => 
+      (order.plan_type === 'monthly' || order.plan_type === 'yearly') && order.status === 'completed'
+    );
+    const hasSinglePurchase = userOrders.some((order: any) => 
+      order.plan_type === 'single' && order.status === 'completed'
+    );
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: result.lastInsertRowid,
+        email,
+        name: name || null,
+      },
+      isPaid: hasActiveSubscription || hasSinglePurchase,
+      isSubscribed: hasActiveSubscription,
+    });
+  } catch (error) {
+    console.error('Register error:', error);
+    res.status(500).json({ error: 'Registration failed' });
+  }
+});
+
+router.post('/login', (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email) as any;
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    const [salt, storedHash] = user.password_hash.split(':');
+    const passwordHash = hashPassword(password, salt);
+
+    if (passwordHash !== storedHash) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    const token = generateToken(user.id, user.email);
+
+    const userOrders = db.prepare('SELECT * FROM orders WHERE user_id = ?').all(user.id);
+    const hasActiveSubscription = userOrders.some((order: any) => 
+      (order.plan_type === 'monthly' || order.plan_type === 'yearly') && order.status === 'completed'
+    );
+    const hasSinglePurchase = userOrders.some((order: any) => 
+      order.plan_type === 'single' && order.status === 'completed'
+    );
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+      isPaid: hasActiveSubscription || hasSinglePurchase,
+      isSubscribed: hasActiveSubscription,
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+router.get('/me', (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    const user = db.prepare('SELECT id, email, name FROM users WHERE id = ?').get(decoded.userId) as any;
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const userOrders = db.prepare('SELECT * FROM orders WHERE user_id = ?').all(user.id);
+    const hasActiveSubscription = userOrders.some((order: any) => 
+      (order.plan_type === 'monthly' || order.plan_type === 'yearly') && order.status === 'completed'
+    );
+    const hasSinglePurchase = userOrders.some((order: any) => 
+      order.plan_type === 'single' && order.status === 'completed'
+    );
+
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+      isPaid: hasActiveSubscription || hasSinglePurchase,
+      isSubscribed: hasActiveSubscription,
+    });
+  } catch (error) {
+    console.error('Get user error:', error);
+    res.status(500).json({ error: 'Failed to get user info' });
+  }
+});
+
+router.get('/verify-purchase', (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    const userOrders = db.prepare('SELECT * FROM orders WHERE user_id = ? AND status = ?').all(decoded.userId, 'completed');
+    const hasActiveSubscription = userOrders.some((order: any) => 
+      (order.plan_type === 'monthly' || order.plan_type === 'yearly')
+    );
+    const hasSinglePurchase = userOrders.some((order: any) => 
+      order.plan_type === 'single'
+    );
+
+    res.json({
+      isPaid: hasActiveSubscription || hasSinglePurchase,
+      isSubscribed: hasActiveSubscription,
+      orders: userOrders,
+    });
+  } catch (error) {
+    console.error('Verify purchase error:', error);
+    res.status(500).json({ error: 'Failed to verify purchase' });
+  }
+});
+
+export { router as authRouter, verifyToken };
+export default router;

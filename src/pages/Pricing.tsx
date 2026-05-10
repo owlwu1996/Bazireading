@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Sparkles, Check, ArrowLeft, CreditCard, Wallet } from 'lucide-react';
+import { Sparkles, Check, ArrowLeft, CreditCard, Wallet, User } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { API_URLS } from '../lib/api';
+import { useStore } from '../store';
 
 declare global {
   interface Window {
@@ -13,6 +14,7 @@ declare global {
 export default function Pricing() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user, authToken, setIsPaid, setIsSubscribed } = useStore();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'paypal'>('paypal');
   const [loading, setLoading] = useState(false);
@@ -106,6 +108,15 @@ export default function Pricing() {
     document.body.appendChild(script);
   };
 
+  const handlePaymentSuccess = () => {
+    setIsPaid(true);
+    if (selectedPlan === 'monthly' || selectedPlan === 'yearly') {
+      setIsSubscribed(true);
+    }
+    alert('Payment successful! Thank you for your purchase. Your account has been upgraded.');
+    navigate('/');
+  };
+
   const renderPayPalButton = () => {
     if (!window.paypal || !paypalRef.current) return;
 
@@ -116,7 +127,10 @@ export default function Pricing() {
           const response = await fetch(API_URLS.paypalCreateOrder, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ plan: selectedPlan }),
+            body: JSON.stringify({ 
+              plan: selectedPlan,
+              userId: user?.id || null
+            }),
           });
 
           const data = await response.json();
@@ -139,13 +153,13 @@ export default function Pricing() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               paypalOrderId: data.orderID,
+              userId: user?.id || null
             }),
           });
 
           const orderResult = await orderResponse.json();
           if (orderResult.success) {
-            alert('Payment successful! Thank you for your purchase.');
-            navigate('/');
+            handlePaymentSuccess();
           } else {
             alert('Payment failed: ' + (orderResult.error || 'Unknown error'));
           }
@@ -175,7 +189,11 @@ export default function Pricing() {
       const response = await fetch(API_URLS.paymentCreateIntent, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: selectedPlan, paymentMethod }),
+        body: JSON.stringify({ 
+          plan: selectedPlan, 
+          paymentMethod,
+          userId: user?.id || null
+        }),
       });
 
       const data = await response.json();
@@ -187,8 +205,7 @@ export default function Pricing() {
           body: JSON.stringify({ orderId: data.orderId }),
         });
 
-        alert('Payment successful! Thank you for your purchase.');
-        navigate('/');
+        handlePaymentSuccess();
       }
     } catch (error) {
       console.error('Payment error:', error);
@@ -216,6 +233,29 @@ export default function Pricing() {
           </h1>
           <p className="text-[#F5F0E8]/60">{t('pricing.subtitle')}</p>
         </div>
+
+        {!user && (
+          <div className="mb-8 p-4 bg-[#D4A853]/10 border border-[#D4A853]/30 rounded-lg text-center">
+            <p className="text-[#F5F0E8]/80 mb-3">
+              Create an account to save your purchases and access them anytime
+            </p>
+            <button
+              onClick={() => navigate('/auth')}
+              className="inline-flex items-center px-4 py-2 bg-[#D4A853] text-[#0F0F0F] font-semibold rounded-lg hover:bg-[#D4A853]/90 transition-colors"
+            >
+              <User className="w-4 h-4 mr-2" />
+              Sign In / Sign Up
+            </button>
+          </div>
+        )}
+
+        {user && (
+          <div className="mb-8 p-4 bg-[#4CAF50]/10 border border-[#4CAF50]/30 rounded-lg text-center">
+            <p className="text-[#4CAF50]">
+              Logged in as {user.email}. Your purchase will be saved to your account.
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {plans.map((plan) => (
@@ -292,6 +332,10 @@ export default function Pricing() {
                 {loading ? 'Processing...' : `Pay ${selectedPlanInfo?.price}${selectedPlanInfo?.period}`}
               </button>
             )}
+
+            <p className="mt-4 text-center text-[#F5F0E8]/40 text-xs">
+              Your purchase will be saved to your account. Cancel anytime.
+            </p>
           </div>
         )}
       </div>

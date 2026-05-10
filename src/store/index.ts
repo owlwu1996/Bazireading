@@ -52,11 +52,18 @@ interface AppState {
   isLoading: boolean;
   language: string;
   isPaid: boolean;
+  isSubscribed: boolean;
+  user: { id: number; email: string; name?: string } | null;
+  authToken: string | null;
   setCurrentChart: (chart: BaziChart | null) => void;
   setCurrentReading: (reading: ReadingReport | null) => void;
   setIsLoading: (loading: boolean) => void;
   setLanguage: (lang: string) => void;
   setIsPaid: (paid: boolean) => void;
+  setIsSubscribed: (subscribed: boolean) => void;
+  setUser: (user: { id: number; email: string; name?: string } | null) => void;
+  setAuthToken: (token: string | null) => void;
+  logout: () => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -64,10 +71,39 @@ export const useStore = create<AppState>((set) => ({
   currentReading: null,
   isLoading: false,
   language: 'en',
-  isPaid: false,
+  isPaid: localStorage.getItem('isPaid') === 'true',
+  isSubscribed: localStorage.getItem('isSubscribed') === 'true',
+  user: JSON.parse(localStorage.getItem('user') || 'null'),
+  authToken: localStorage.getItem('authToken'),
   setCurrentChart: (chart) => set({ currentChart: chart }),
   setCurrentReading: (reading) => set({ currentReading: reading }),
   setIsLoading: (loading) => set({ isLoading: loading }),
   setLanguage: (lang) => set({ language: lang }),
-  setIsPaid: (paid) => set({ isPaid: paid }),
+  setIsPaid: (paid) => {
+    localStorage.setItem('isPaid', paid ? 'true' : 'false');
+    set({ isPaid: paid });
+  },
+  setIsSubscribed: (subscribed) => {
+    localStorage.setItem('isSubscribed', subscribed ? 'true' : 'false');
+    set({ isSubscribed: subscribed });
+  },
+  setUser: (user) => {
+    localStorage.setItem('user', JSON.stringify(user));
+    set({ user });
+  },
+  setAuthToken: (token) => {
+    if (token) {
+      localStorage.setItem('authToken', token);
+    } else {
+      localStorage.removeItem('authToken');
+    }
+    set({ authToken: token });
+  },
+  logout: () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('isPaid');
+    localStorage.removeItem('isSubscribed');
+    set({ authToken: null, user: null, isPaid: false, isSubscribed: false });
+  },
 }));
