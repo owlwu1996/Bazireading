@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { calculateBazi } from '../services/baziCalculation';
 import { generateReading, generateCompatibilityReading } from '../services/readingGeneration';
 import db from '../database';
+import jwt from 'jsonwebtoken';
 
 const router = Router();
 
@@ -20,7 +21,6 @@ router.post('/calculate', (req, res) => {
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
-        const jwt = require('jsonwebtoken');
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'bazi-reading-secret-key');
         userId = decoded.userId;
       }
@@ -152,7 +152,6 @@ router.get('/history', (req, res) => {
     }
 
     const token = authHeader.split(' ')[1];
-    const jwt = require('jsonwebtoken');
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'bazi-reading-secret-key');
     const userId = decoded.userId;
 
