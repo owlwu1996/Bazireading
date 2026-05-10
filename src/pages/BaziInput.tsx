@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, ArrowLeft, Info, UserCircle } from 'lucide-react';
@@ -9,7 +9,8 @@ import BaguaLoader from '../components/BaguaLoader';
 export default function BaziInput() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { setCurrentChart, setIsLoading, isLoading } = useStore();
+  const { setCurrentChart, setIsLoading, isLoading, user } = useStore();
+  const isAuthenticated = !!user;
 
   const [formData, setFormData] = useState({
     name: '',
@@ -35,6 +36,13 @@ export default function BaziInput() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isAuthenticated) {
+      const currentPath = window.location.pathname;
+      navigate(`/auth?redirect=${currentPath}`);
+      return;
+    }
+
     setIsLoading(true);
 
     const birthDate = `${formData.birthYear}-${formData.birthMonth.padStart(2, '0')}-${formData.birthDay.padStart(2, '0')}`;
