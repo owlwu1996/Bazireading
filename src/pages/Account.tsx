@@ -76,7 +76,7 @@ export default function Account() {
         setCurrentReading({
           id: item.readingId.toString(),
           baziId: item.id.toString(),
-          type: item.readingType || 'basic',
+          type: (item.readingType || 'basic') as 'basic' | 'full' | 'compatibility',
           sections: item.readingSections,
           createdAt: item.readingDate || item.createdAt,
         });
