@@ -6,7 +6,7 @@ import { verifyToken } from './auth';
 
 const router = Router();
 
-router.post('/calculate', (req, res) => {
+router.post('/calculate', async (req, res) => {
   try {
     const { birthDate, birthTime, birthCity, gender } = req.body;
 
@@ -24,7 +24,7 @@ router.post('/calculate', (req, res) => {
         const decoded = verifyToken(token);
         if (decoded) {
           try {
-            const userCheck = db.prepare('SELECT id FROM users WHERE id = ?').get(decoded.userId);
+            const userCheck = await db.prepare('SELECT id FROM users WHERE id = $1').get(decoded.userId);
             if (userCheck) {
               userId = decoded.userId;
             }
@@ -37,33 +37,26 @@ router.post('/calculate', (req, res) => {
       console.log('No valid auth token, saving chart without user');
     }
 
-    const stmt = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO bazi_charts (user_id, birth_date, birth_time, birth_city, gender, four_pillars, five_elements, ten_gods, day_master, life_cycles)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    let result: any;
-    try {
-      result = stmt.run(
-        userId,
-        birthDate,
-        birthTime || '12:00',
-        birthCity || '',
-        gender,
-        JSON.stringify(chart.fourPillars),
-        JSON.stringify(chart.fiveElements),
-        JSON.stringify(chart.tenGods),
-        JSON.stringify(chart.dayMaster),
-        JSON.stringify(chart.lifeCycles)
-      );
-    } catch (insertErr: any) {
-      console.error('Insert error:', insertErr);
-      return res.status(500).json({ error: 'Failed to save chart: ' + insertErr.message });
-    }
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING id
+    `).get(
+      userId,
+      birthDate,
+      birthTime || '12:00',
+      birthCity || '',
+      gender,
+      JSON.stringify(chart.fourPillars),
+      JSON.stringify(chart.fiveElements),
+      JSON.stringify(chart.tenGods),
+      JSON.stringify(chart.dayMaster),
+      JSON.stringify(chart.lifeCycles)
+    );
 
     res.json({
       ...chart,
-      dbId: result.lastInsertRowid,
+      dbId: result.id,
     });
   } catch (error) {
     console.error('Bazi calculation error:', error);
@@ -71,12 +64,11 @@ router.post('/calculate', (req, res) => {
   }
 });
 
-router.post('/reading', (req, res) => {
+router.post('/reading', async (req, res) => {
   try {
     const { baziId, type = 'full' } = req.body;
 
-    const chartStmt = db.prepare('SELECT * FROM bazi_charts WHERE id = ?');
-    const row = chartStmt.get(baziId) as any;
+    const row: any = await db.prepare('SELECT * FROM bazi_charts WHERE id = $1').get(baziId);
 
     if (!row) {
       return res.status(404).json({ error: 'Bazi chart not found' });
@@ -93,22 +85,21 @@ router.post('/reading', (req, res) => {
 
     const reading = generateReading(chart, type);
 
-    const stmt = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO readings (bazi_id, user_id, type, sections, is_paid)
-      VALUES (?, ?, ?, ?, ?)
-    `);
-
-    const result = stmt.run(
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id
+    `).get(
       baziId,
-      null,
+      row.user_id,
       type,
       JSON.stringify(reading.sections),
-      type === 'full' ? 0 : 1
+      type === 'full' ? false : true
     );
 
     res.json({
       ...reading,
-      dbId: result.lastInsertRowid,
+      dbId: result.id,
     });
   } catch (error) {
     console.error('Reading generation error:', error);
@@ -116,7 +107,7 @@ router.post('/reading', (req, res) => {
   }
 });
 
-router.post('/compatibility', (req, res) => {
+router.post('/compatibility', async (req, res) => {
   try {
     const { personA, personB } = req.body;
 
@@ -136,11 +127,10 @@ router.post('/compatibility', (req, res) => {
   }
 });
 
-router.get('/chart/:id', (req, res) => {
+router.get('/chart/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const stmt = db.prepare('SELECT * FROM bazi_charts WHERE id = ?');
-    const row = stmt.get(id) as any;
+    const row: any = await db.prepare('SELECT * FROM bazi_charts WHERE id = $1').get(id);
 
     if (!row) {
       return res.status(404).json({ error: 'Chart not found' });
@@ -159,7 +149,7 @@ router.get('/chart/:id', (req, res) => {
   }
 });
 
-router.get('/history', (req, res) => {
+router.get('/history', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -173,15 +163,14 @@ router.get('/history', (req, res) => {
     }
     const userId = decoded.userId;
 
-    const chartsStmt = db.prepare(`
+    const charts = await db.prepare(`
       SELECT c.*, r.id as reading_id, r.type as reading_type, r.sections as reading_sections, r.created_at as reading_date
       FROM bazi_charts c
       LEFT JOIN readings r ON c.id = r.bazi_id
-      WHERE c.user_id = ?
+      WHERE c.user_id = $1
       ORDER BY c.created_at DESC
       LIMIT 20
-    `);
-    const charts = chartsStmt.all(userId);
+    `).all(userId);
 
     const formattedCharts = charts.map((row: any) => ({
       id: row.id,

@@ -5,7 +5,6 @@ import db from '../database';
 const router = Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'bazireading-secret-key-2024';
-const JWT_EXPIRES_IN = '7d';
 
 function hashPassword(password: string, salt: string): string {
   return crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
@@ -18,23 +17,23 @@ function generateToken(userId: number, email: string): string {
   return `${base64Payload}.${signature}`;
 }
 
-function verifyToken(token: string): { userId: number; email: string } | null {
+export function verifyToken(token: string): { userId: number; email: string } | null {
   try {
     const [base64Payload, signature] = token.split('.');
     const expectedSignature = crypto.createHmac('sha256', JWT_SECRET).update(base64Payload).digest('hex');
     if (signature !== expectedSignature) return null;
-    
+
     const payload = JSON.parse(Buffer.from(base64Payload, 'base64').toString());
     const expTime = payload.iat + 7 * 24 * 60 * 60;
     if (Math.floor(Date.now() / 1000) > expTime) return null;
-    
+
     return { userId: payload.userId, email: payload.email };
   } catch {
     return null;
   }
 }
 
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   try {
     const { email, password, name } = req.body;
 
@@ -46,7 +45,7 @@ router.post('/register', (req, res) => {
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
 
-    const existingUser = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+    const existingUser = await db.prepare('SELECT id FROM users WHERE email = $1').get(email);
     if (existingUser) {
       return res.status(400).json({ error: 'Email already registered' });
     }
@@ -54,19 +53,19 @@ router.post('/register', (req, res) => {
     const salt = crypto.randomBytes(32).toString('hex');
     const passwordHash = hashPassword(password, salt);
 
-    const stmt = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO users (email, password_hash, name)
-      VALUES (?, ?, ?)
-    `);
-    const result = stmt.run(email, `${salt}:${passwordHash}`, name || null);
+      VALUES ($1, $2, $3)
+      RETURNING id
+    `).get(email, `${salt}:${passwordHash}`, name || null);
 
-    const token = generateToken(result.lastInsertRowid as number, email);
+    const token = generateToken(result.id, email);
 
-    const userOrders = db.prepare('SELECT * FROM orders WHERE user_id = ?').all(result.lastInsertRowid);
-    const hasActiveSubscription = userOrders.some((order: any) => 
+    const userOrders = await db.prepare('SELECT * FROM orders WHERE user_id = $1').all(result.id);
+    const hasActiveSubscription = userOrders.some((order: any) =>
       (order.plan_type === 'monthly' || order.plan_type === 'yearly') && order.status === 'completed'
     );
-    const hasSinglePurchase = userOrders.some((order: any) => 
+    const hasSinglePurchase = userOrders.some((order: any) =>
       order.plan_type === 'single' && order.status === 'completed'
     );
 
@@ -74,7 +73,7 @@ router.post('/register', (req, res) => {
       success: true,
       token,
       user: {
-        id: result.lastInsertRowid,
+        id: result.id,
         email,
         name: name || null,
       },
@@ -87,7 +86,7 @@ router.post('/register', (req, res) => {
   }
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -95,7 +94,7 @@ router.post('/login', (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email) as any;
+    const user: any = await db.prepare('SELECT * FROM users WHERE email = $1').get(email);
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -109,11 +108,11 @@ router.post('/login', (req, res) => {
 
     const token = generateToken(user.id, user.email);
 
-    const userOrders = db.prepare('SELECT * FROM orders WHERE user_id = ?').all(user.id);
-    const hasActiveSubscription = userOrders.some((order: any) => 
+    const userOrders = await db.prepare('SELECT * FROM orders WHERE user_id = $1').all(user.id);
+    const hasActiveSubscription = userOrders.some((order: any) =>
       (order.plan_type === 'monthly' || order.plan_type === 'yearly') && order.status === 'completed'
     );
-    const hasSinglePurchase = userOrders.some((order: any) => 
+    const hasSinglePurchase = userOrders.some((order: any) =>
       order.plan_type === 'single' && order.status === 'completed'
     );
 
@@ -134,7 +133,7 @@ router.post('/login', (req, res) => {
   }
 });
 
-router.get('/me', (req, res) => {
+router.get('/me', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -147,16 +146,16 @@ router.get('/me', (req, res) => {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    const user = db.prepare('SELECT id, email, name FROM users WHERE id = ?').get(decoded.userId) as any;
+    const user: any = await db.prepare('SELECT id, email, name FROM users WHERE id = $1').get(decoded.userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const userOrders = db.prepare('SELECT * FROM orders WHERE user_id = ?').all(user.id);
-    const hasActiveSubscription = userOrders.some((order: any) => 
+    const userOrders = await db.prepare('SELECT * FROM orders WHERE user_id = $1').all(user.id);
+    const hasActiveSubscription = userOrders.some((order: any) =>
       (order.plan_type === 'monthly' || order.plan_type === 'yearly') && order.status === 'completed'
     );
-    const hasSinglePurchase = userOrders.some((order: any) => 
+    const hasSinglePurchase = userOrders.some((order: any) =>
       order.plan_type === 'single' && order.status === 'completed'
     );
 
@@ -175,7 +174,7 @@ router.get('/me', (req, res) => {
   }
 });
 
-router.get('/verify-purchase', (req, res) => {
+router.get('/verify-purchase', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -188,11 +187,11 @@ router.get('/verify-purchase', (req, res) => {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    const userOrders = db.prepare('SELECT * FROM orders WHERE user_id = ? AND status = ?').all(decoded.userId, 'completed');
-    const hasActiveSubscription = userOrders.some((order: any) => 
+    const userOrders = await db.prepare('SELECT * FROM orders WHERE user_id = $1 AND status = $2').all(decoded.userId, 'completed');
+    const hasActiveSubscription = userOrders.some((order: any) =>
       (order.plan_type === 'monthly' || order.plan_type === 'yearly')
     );
-    const hasSinglePurchase = userOrders.some((order: any) => 
+    const hasSinglePurchase = userOrders.some((order: any) =>
       order.plan_type === 'single'
     );
 
@@ -207,5 +206,5 @@ router.get('/verify-purchase', (req, res) => {
   }
 });
 
-export { router as authRouter, verifyToken };
+export { router as authRouter };
 export default router;

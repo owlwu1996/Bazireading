@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { createCheckout, parseWebhookEvent } from '../services/lemonSqueezy';
 import db from '../database';
-import crypto from 'crypto';
 
 const router = Router();
 
@@ -32,7 +31,7 @@ router.post('/create-checkout', async (req, res) => {
   }
 });
 
-router.post('/webhook', (req, res) => {
+router.post('/webhook', async (req, res) => {
   try {
     const signature = req.headers['x-signature'] as string;
     const payload = JSON.stringify(req.body);
@@ -54,20 +53,20 @@ router.post('/webhook', (req, res) => {
 
     if (event.eventName === 'subscription_created' || event.eventName === 'subscription_updated') {
       if (event.customerEmail && event.status) {
-        const user = db.prepare('SELECT id FROM users WHERE email = ?').get(event.customerEmail) as any;
+        const user: any = await db.prepare('SELECT id FROM users WHERE email = $1').get(event.customerEmail);
 
         if (user) {
           const planType = event.planType === plans.yearly.variantId.toString() ? 'yearly' : 'monthly';
           const status = event.status === 'active' ? 'completed' : 'pending';
 
           if (event.eventName === 'subscription_created') {
-            db.prepare(`
+            await db.prepare(`
               INSERT INTO orders (user_id, plan_type, amount, currency, status, payment_method, payment_id, paid_at)
-              VALUES (?, ?, ?, 'USD', ?, 'lemonsqueezy', ?, datetime('now'))
+              VALUES ($1, $2, $3, 'USD', $4, 'lemonsqueezy', $5, CURRENT_TIMESTAMP)
             `).run(user.id, planType, 0, status, event.subscriptionId);
           } else if (event.status === 'cancelled' || event.status === 'expired') {
-            db.prepare(`
-              UPDATE orders SET status = ? WHERE payment_id = ?
+            await db.prepare(`
+              UPDATE orders SET status = $1 WHERE payment_id = $2
             `).run('cancelled', event.subscriptionId);
           }
         }
