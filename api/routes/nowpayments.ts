@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createPayment, verifyWebhookSignature, parsePaymentStatus } from '../services/nowPayments';
+import { createPayment, getPaymentStatus, verifyWebhookSignature, parsePaymentStatus } from '../services/nowPayments';
 import db from '../database';
 
 const router = Router();
@@ -52,7 +52,7 @@ router.post('/webhook', async (req, res) => {
 
     const { payment_status, order_id, pay_amount, pay_currency, price_amount } = req.body;
 
-    console.log('NowPayments webhook:', { payment_status, order_id, order_id: req.body.order_id });
+    console.log('NowPayments webhook:', { payment_status, order_id, email: req.body.email });
 
     const paymentInfo = parsePaymentStatus(payment_status);
     console.log('Payment parsed status:', paymentInfo);
