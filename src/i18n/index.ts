@@ -54,25 +54,18 @@ const resources = {
         analysis: 'Compatibility Analysis',
       },
       pricing: {
-        title: 'Choose Your Plan',
-        subtitle: 'Unlock the full power of your destiny',
+        title: 'Unlock Your Full Report',
+        subtitle: 'One payment for lifetime access',
         free: {
           name: 'Free',
           price: '$0',
           features: ['Basic personality overview', 'Element analysis', 'Limited access'],
         },
-        monthly: {
-          name: 'Monthly',
+        paid: {
+          name: 'Full Report',
           price: '$29',
-          period: '/month',
-          features: ['Unlimited readings', 'Full reports', 'Compatibility analysis', 'Monthly forecasts'],
-        },
-        yearly: {
-          name: 'Yearly',
-          price: '$199',
-          period: '/year',
           badge: 'Best Value',
-          features: ['Everything in Monthly', 'Annual forecasts', 'Priority support', 'Save 43%'],
+          features: ['Complete personality profile', 'Love & compatibility', 'Career guidance', 'Annual & monthly forecasts', 'Lifetime access'],
         },
       },
       elements: {
@@ -140,25 +133,18 @@ const resources = {
         analysis: 'Análisis de Compatibilidad',
       },
       pricing: {
-        title: 'Elige tu Plan',
-        subtitle: 'Desbloquea el poder de tu destino',
+        title: 'Desbloquea Tu Informe Completo',
+        subtitle: 'Un pago para acceso de por vida',
         free: {
           name: 'Gratis',
           price: '$0',
           features: ['Resumen básico de personalidad', 'Análisis de elementos', 'Acceso limitado'],
         },
-        monthly: {
-          name: 'Mensual',
+        paid: {
+          name: 'Informe Completo',
           price: '$29',
-          period: '/mes',
-          features: ['Lecturas ilimitadas', 'Informes completos', 'Análisis de compatibilidad', 'Pronósticos mensuales'],
-        },
-        yearly: {
-          name: 'Anual',
-          price: '$199',
-          period: '/año',
           badge: 'Mejor Valor',
-          features: ['Todo en Mensual', 'Pronósticos anuales', 'Soporte prioritario', 'Ahorra 43%'],
+          features: ['Perfil de personalidad completo', 'Amor y compatibilidad', 'Orientación profesional', 'Pronósticos anuales y mensuales', 'Acceso de por vida'],
         },
       },
       elements: {
@@ -312,25 +298,18 @@ const resources = {
         analysis: 'Kompatibilitätsanalyse',
       },
       pricing: {
-        title: 'Wählen Sie Ihren Plan',
-        subtitle: 'Erschließen Sie die Kraft Ihres Schicksals',
+        title: 'Schalten Sie Ihren Vollständigen Bericht Frei',
+        subtitle: 'Eine Zahlung für lebenslangen Zugang',
         free: {
           name: 'Kostenlos',
           price: '0€',
           features: ['Grundlegender Persönlichkeitsüberblick', 'Elementanalyse', 'Begrenzter Zugang'],
         },
-        monthly: {
-          name: 'Monatlich',
+        paid: {
+          name: 'Vollständiger Bericht',
           price: '29€',
-          period: '/Monat',
-          features: ['Unbegrenzte Lesungen', 'Vollständige Berichte', 'Kompatibilitätsanalyse', 'Monatliche Prognosen'],
-        },
-        yearly: {
-          name: 'Jährlich',
-          price: '199€',
-          period: '/Jahr',
           badge: 'Bester Wert',
-          features: ['Alles in Monatlich', 'Jahresprognosen', 'Prioritätsupport', '43% sparen'],
+          features: ['Vollständiges Persönlichkeitsprofil', 'Liebe und Kompatibilität', 'Berufliche Orientierung', 'Jahres- und Monatsprognosen', 'Lebenslanger Zugang'],
         },
       },
       elements: {
@@ -398,25 +377,18 @@ const resources = {
         analysis: '合盘分析',
       },
       pricing: {
-        title: '选择你的方案',
-        subtitle: '解锁你命运的全部力量',
+        title: '解锁完整报告',
+        subtitle: '一次付费，永久访问',
         free: {
           name: '免费',
           price: '¥0',
           features: ['基础性格概述', '五行分析', '有限访问'],
         },
-        monthly: {
-          name: '月度',
+        paid: {
+          name: '完整报告',
           price: '¥199',
-          period: '/月',
-          features: ['无限次数解析', '完整报告', '合盘分析', '月度运势'],
-        },
-        yearly: {
-          name: '年度',
-          price: '¥999',
-          period: '/年',
-          badge: '最佳价值',
-          features: ['包含月度全部功能', '年度运势', '优先客服', '节省58%'],
+          badge: '最佳选择',
+          features: ['完整性格分析', '爱情与合盘', '事业财运指导', '年度月度运势', '永久访问权限'],
         },
       },
       elements: {

@@ -122,19 +122,12 @@ export default function Home() {
       highlighted: false,
     },
     {
-      name: t('pricing.monthly.name'),
-      price: t('pricing.monthly.price'),
-      period: t('pricing.monthly.period'),
-      features: t('pricing.monthly.features', { returnObjects: true }) as string[],
-      highlighted: false,
-    },
-    {
-      name: t('pricing.yearly.name'),
-      price: t('pricing.yearly.price'),
-      period: t('pricing.yearly.period'),
-      features: t('pricing.yearly.features', { returnObjects: true }) as string[],
+      name: t('pricing.paid.name'),
+      price: t('pricing.paid.price'),
+      period: '',
+      features: t('pricing.paid.features', { returnObjects: true }) as string[],
       highlighted: true,
-      badge: t('pricing.yearly.badge'),
+      badge: t('pricing.paid.badge'),
     },
   ];
 

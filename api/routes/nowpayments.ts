@@ -5,9 +5,7 @@ import db from '../database';
 const router = Router();
 
 const plans: Record<string, { amount: number; name: string }> = {
-  single: { amount: 29, name: 'Single Report' },
-  monthly: { amount: 29, name: 'Monthly Subscription' },
-  yearly: { amount: 199, name: 'Yearly Subscription' },
+  full: { amount: 29, name: 'Full Report' },
 };
 
 router.post('/create-payment', async (req, res) => {
