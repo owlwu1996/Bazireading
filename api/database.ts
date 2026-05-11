@@ -10,9 +10,16 @@ let sqliteDb: Database.Database | null = null;
 
 if (isPostgres) {
   console.log('Initializing PostgreSQL connection...');
+  console.log('Database URL:', process.env.DATABASE_URL?.replace(/:[^:@]+@/, ':***@'));
+
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    ssl: {
+      rejectUnauthorized: false
+    },
+    connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: 30000,
+    max: 20,
   });
 
   pool.on('error', (err) => {
