@@ -48,7 +48,7 @@ export async function createPayment(params: {
     cancel_url: `${process.env.FRONTEND_URL || 'https://bazireading.cc'}/pricing`,
   };
 
-  const response = await fetch(`${NOWPAYMENTS_API_URL}/payment`, {
+  const response = await fetch(`${NOWPAYMENTS_API_URL}/invoice`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -62,10 +62,10 @@ export async function createPayment(params: {
     throw new Error(`NowPayments API error: ${JSON.stringify(error)}`);
   }
 
-  const payment: PaymentResponse = await response.json();
+  const payment: any = await response.json();
   
   return {
-    paymentUrl: `https://nowpayments.io/payment/?paymentId=${payment.id}`,
+    paymentUrl: payment.invoice_url,
     paymentId: payment.id.toString(),
   };
 }
