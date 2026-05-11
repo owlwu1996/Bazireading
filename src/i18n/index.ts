@@ -63,16 +63,16 @@ const resources = {
         },
         monthly: {
           name: 'Monthly',
-          price: '$9.9',
+          price: '$29',
           period: '/month',
           features: ['Unlimited readings', 'Full reports', 'Compatibility analysis', 'Monthly forecasts'],
         },
         yearly: {
           name: 'Yearly',
-          price: '$79',
+          price: '$199',
           period: '/year',
           badge: 'Best Value',
-          features: ['Everything in Monthly', 'Annual forecasts', 'Priority support', 'Save 34%'],
+          features: ['Everything in Monthly', 'Annual forecasts', 'Priority support', 'Save 43%'],
         },
       },
       elements: {
@@ -149,16 +149,16 @@ const resources = {
         },
         monthly: {
           name: 'Mensual',
-          price: '$9.9',
+          price: '$29',
           period: '/mes',
           features: ['Lecturas ilimitadas', 'Informes completos', 'Análisis de compatibilidad', 'Pronósticos mensuales'],
         },
         yearly: {
           name: 'Anual',
-          price: '$79',
+          price: '$199',
           period: '/año',
           badge: 'Mejor Valor',
-          features: ['Todo en Mensual', 'Pronósticos anuales', 'Soporte prioritario', 'Ahorra 34%'],
+          features: ['Todo en Mensual', 'Pronósticos anuales', 'Soporte prioritario', 'Ahorra 43%'],
         },
       },
       elements: {
@@ -235,16 +235,16 @@ const resources = {
         },
         monthly: {
           name: 'Mensuel',
-          price: '9.9€',
+          price: '29€',
           period: '/mois',
           features: ['Lectures illimitées', 'Rapports complets', 'Analyse de compatibilité', 'Prévisions mensuelles'],
         },
         yearly: {
           name: 'Annuel',
-          price: '79€',
+          price: '199€',
           period: '/an',
           badge: 'Meilleure Valeur',
-          features: ['Tout en Mensuel', 'Prévisions annuelles', 'Support prioritaire', 'Économisez 34%'],
+          features: ['Tout en Mensuel', 'Prévisions annuelles', 'Support prioritaire', 'Économisez 43%'],
         },
       },
       elements: {
@@ -321,16 +321,16 @@ const resources = {
         },
         monthly: {
           name: 'Monatlich',
-          price: '9.9€',
+          price: '29€',
           period: '/Monat',
           features: ['Unbegrenzte Lesungen', 'Vollständige Berichte', 'Kompatibilitätsanalyse', 'Monatliche Prognosen'],
         },
         yearly: {
           name: 'Jährlich',
-          price: '79€',
+          price: '199€',
           period: '/Jahr',
           badge: 'Bester Wert',
-          features: ['Alles in Monatlich', 'Jahresprognosen', 'Prioritätsupport', '34% sparen'],
+          features: ['Alles in Monatlich', 'Jahresprognosen', 'Prioritätsupport', '43% sparen'],
         },
       },
       elements: {
@@ -407,16 +407,16 @@ const resources = {
         },
         monthly: {
           name: '月度',
-          price: '¥68',
+          price: '¥199',
           period: '/月',
           features: ['无限次数解析', '完整报告', '合盘分析', '月度运势'],
         },
         yearly: {
           name: '年度',
-          price: '¥568',
+          price: '¥999',
           period: '/年',
           badge: '最佳价值',
-          features: ['包含月度全部功能', '年度运势', '优先客服', '节省34%'],
+          features: ['包含月度全部功能', '年度运势', '优先客服', '节省58%'],
         },
       },
       elements: {
