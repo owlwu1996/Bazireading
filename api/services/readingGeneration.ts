@@ -160,16 +160,11 @@ export function generateReading(chart: BaziChart, type: 'basic' | 'full' = 'full
   const sections: ReadingSection[] = [
     { title: 'Personality Profile', content: generatePersonalityProfile(chart), icon: 'User' },
     { title: 'Strengths & Weaknesses', content: generateStrengthsWeaknesses(chart), icon: 'Scale' },
+    { title: 'Love & Compatibility', content: type === 'full' ? generateLoveCompatibility(chart) : '[LOCKED]', icon: 'Heart' },
+    { title: 'Career & Money', content: type === 'full' ? generateCareerMoney(chart) : '[LOCKED]', icon: 'Briefcase' },
+    { title: 'Annual Forecast', content: type === 'full' ? generateAnnualForecast() : '[LOCKED]', icon: 'Calendar' },
+    { title: 'Monthly Forecast', content: type === 'full' ? generateMonthlyForecast() : '[LOCKED]', icon: 'TrendingUp' },
   ];
-
-  if (type === 'full') {
-    sections.push(
-      { title: 'Love & Compatibility', content: generateLoveCompatibility(chart), icon: 'Heart' },
-      { title: 'Career & Money', content: generateCareerMoney(chart), icon: 'Briefcase' },
-      { title: 'Annual Forecast', content: generateAnnualForecast(), icon: 'Calendar' },
-      { title: 'Monthly Forecast', content: generateMonthlyForecast(), icon: 'TrendingUp' }
-    );
-  }
 
   return {
     id: `reading_${Date.now()}`,
