@@ -7,6 +7,7 @@ const { Pool } = pg;
 export const isPostgres = !!process.env.DATABASE_URL;
 let pool: pg.Pool | null = null;
 let sqliteDb: Database.Database | null = null;
+let dbReady: Promise<void> = Promise.resolve();
 
 if (isPostgres) {
   console.log('Initializing PostgreSQL connection...');
@@ -29,6 +30,7 @@ if (isPostgres) {
   async function initPostgresTables() {
     const client = await pool!.connect();
     try {
+      console.log('Creating users table...');
       await client.query(`
         CREATE TABLE IF NOT EXISTS users (
           id SERIAL PRIMARY KEY,
@@ -41,7 +43,9 @@ if (isPostgres) {
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
+      console.log('Users table created');
 
+      console.log('Creating bazi_charts table...');
       await client.query(`
         CREATE TABLE IF NOT EXISTS bazi_charts (
           id SERIAL PRIMARY KEY,
@@ -59,7 +63,9 @@ if (isPostgres) {
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
         )
       `);
+      console.log('Bazi charts table created');
 
+      console.log('Creating readings table...');
       await client.query(`
         CREATE TABLE IF NOT EXISTS readings (
           id SERIAL PRIMARY KEY,
@@ -73,7 +79,9 @@ if (isPostgres) {
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
         )
       `);
+      console.log('Readings table created');
 
+      console.log('Creating orders table...');
       await client.query(`
         CREATE TABLE IF NOT EXISTS orders (
           id SERIAL PRIMARY KEY,
@@ -89,7 +97,9 @@ if (isPostgres) {
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
         )
       `);
+      console.log('Orders table created');
 
+      console.log('Creating compatibilities table...');
       await client.query(`
         CREATE TABLE IF NOT EXISTS compatibilities (
           id SERIAL PRIMARY KEY,
@@ -105,7 +115,9 @@ if (isPostgres) {
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
         )
       `);
+      console.log('Compatibilities table created');
 
+      console.log('Creating subscriptions table...');
       await client.query(`
         CREATE TABLE IF NOT EXISTS subscriptions (
           id SERIAL PRIMARY KEY,
@@ -117,14 +129,15 @@ if (isPostgres) {
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )
       `);
+      console.log('Subscriptions table created');
 
-      console.log('PostgreSQL tables initialized');
+      console.log('All PostgreSQL tables initialized successfully');
     } finally {
       client.release();
     }
   }
 
-  initPostgresTables().catch(err => {
+  dbReady = initPostgresTables().catch(err => {
     console.error('Failed to initialize PostgreSQL tables:', err);
   });
 } else {
@@ -220,14 +233,17 @@ export const db = {
     if (isPostgres && pool) {
       return {
         get: async (...params: any[]) => {
+          await dbReady;
           const result = await pool.query(sql, params);
           return result.rows[0] || null;
         },
         all: async (...params: any[]) => {
+          await dbReady;
           const result = await pool.query(sql, params);
           return result.rows;
         },
         run: async (...params: any[]) => {
+          await dbReady;
           const result = await pool.query(sql, params);
           return {
             lastInsertRowid: result.rows[0]?.id,
