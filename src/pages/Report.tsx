@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Sparkles, User, Scale, Heart, Briefcase, Calendar, TrendingUp, Lock, ArrowLeft, Loader2, Camera, ExternalLink } from 'lucide-react';
+import { Sparkles, User, Scale, Heart, Briefcase, Calendar, TrendingUp, Lock, ArrowLeft, Loader2, Camera, ExternalLink, Unlock } from 'lucide-react';
 import { useStore } from '../store';
 import { API_URLS } from '../lib/api';
 
@@ -60,6 +60,13 @@ function ShareCTA() {
     </div>
   );
 }
+
+const lockedFeatures = [
+  { icon: Heart, title: 'Love & Compatibility', desc: 'Relationship patterns and cosmic connections' },
+  { icon: Briefcase, title: 'Career & Money', desc: 'Professional path and financial guidance' },
+  { icon: Calendar, title: 'Annual Forecast', desc: 'Year ahead cosmic timing insights' },
+  { icon: TrendingUp, title: 'Monthly Forecast', desc: 'Monthly guidance and opportunities' },
+];
 
 export default function Report() {
   const navigate = useNavigate();
@@ -406,9 +413,34 @@ export default function Report() {
                 const Icon = iconMap[section.icon] || Sparkles;
                 const isLocked = reading.type === 'basic' && index >= 2;
                 return (
-                  <div key={index} className={`bg-[#1a1a1a]/70 border rounded-xl overflow-hidden transition-all ${isLocked ? 'border-[#D4A853]/5 opacity-50' : 'border-[#D4A853]/15'}`}>
+                  <div key={index} className={`bg-[#1a1a1a]/70 border rounded-xl overflow-hidden transition-all ${isLocked ? 'border-[#D4A853]/30' : 'border-[#D4A853]/15'}`}>
+                    {isLocked && (
+                      <div className="relative">
+                        <div className="absolute inset-0 z-10 bg-gradient-to-b from-[#D4A853]/20 to-transparent pointer-events-none" />
+                        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20">
+                          <div className="bg-gradient-to-r from-[#D4A853] to-[#B87333] text-[#0F0F0F] px-4 py-2 rounded-full text-sm font-semibold flex items-center shadow-lg">
+                            <Unlock className="w-4 h-4 mr-2" />
+                            Unlock Full Report
+                          </div>
+                        </div>
+                        <div className="absolute top-12 left-1/2 -translate-x-1/2 z-20 text-center">
+                          <p className="text-xs text-[#D4A853] font-medium mb-1">Get access to:</p>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] text-[#F5F0E8]/80">
+                            {lockedFeatures.slice(index - 2).map((feature, fi) => (
+                              <span key={fi} className="flex items-center justify-center">
+                                <feature.icon className="w-3 h-3 mr-1" />
+                                {feature.title}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     <button onClick={() => {
-                      if (isLocked) return;
+                      if (isLocked) {
+                        setShowPaymentModal(true);
+                        return;
+                      }
                       const newSet = new Set(expandedSections);
                       if (newSet.has(index)) newSet.delete(index);
                       else newSet.add(index);
@@ -423,8 +455,8 @@ export default function Report() {
                       </div>
                       {isLocked && <Lock className="w-3.5 h-3.5 text-[#D4A853]" />}
                     </button>
-                    {expandedSections.has(index) && !isLocked && (
-                      <div className="px-3 pb-2">
+                    {expandedSections.has(index) && (
+                      <div className={`px-3 pb-2 ${isLocked ? 'blur-md select-none pointer-events-none' : ''}`}>
                         <div className="text-sm text-[#F5F0E8]/80 leading-relaxed">
                           <span dangerouslySetInnerHTML={{
                             __html: section.content
@@ -461,7 +493,7 @@ export default function Report() {
                 onClick={() => { setShowPaymentModal(false); navigate('/pricing'); }}
                 className="w-full py-3 bg-gradient-to-r from-[#D4A853] to-[#B87333] text-[#0F0F0F] font-semibold rounded-lg hover:shadow-[0_0_20px_rgba(212,168,83,0.3)] transition-all"
               >
-                Go to Pricing
+                Go to Pricing - $29
               </button>
               <button
                 onClick={() => setShowPaymentModal(false)}
