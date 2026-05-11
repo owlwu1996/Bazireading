@@ -4,6 +4,7 @@ import baziRoutes from './routes/bazi';
 import paymentRoutes from './routes/payment';
 import paypalRoutes from './routes/paypal';
 import paddleRoutes from './routes/paddle';
+import lemonSqueezyRoutes from './routes/lemonSqueezy';
 import authRoutes from './routes/auth';
 
 const app = express();
@@ -24,12 +25,14 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
 app.use(express.json());
 
 app.use('/api/bazi', baziRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/paypal', paypalRoutes);
 app.use('/api/paddle', paddleRoutes);
+app.use('/api/lemonsqueezy', lemonSqueezyRoutes);
 app.use('/api/auth', authRoutes);
 
 app.get('/api/health', (req, res) => {

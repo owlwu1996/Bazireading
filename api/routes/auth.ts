@@ -4,7 +4,7 @@ import db from '../database';
 
 const router = Router();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'bazi-reading-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'bazireading-secret-key-2024';
 const JWT_EXPIRES_IN = '7d';
 
 function hashPassword(password: string, salt: string): string {
