@@ -38,10 +38,9 @@ export async function createPayment(params: {
     throw new Error('NowPayments API key not configured');
   }
 
-  const paymentData: PaymentRequest = {
+  const paymentData: any = {
     price_amount: params.amount,
     price_currency: params.currency || 'USD',
-    pay_currency: 'BTC', // Default to Bitcoin
     order_id: params.orderId || `order_${Date.now()}`,
     order_description: params.description || 'Bazi Reading Purchase',
     ipn_callback_url: `${process.env.API_URL || 'https://bazireading-api.onrender.com'}/api/nowpayments/webhook`,
