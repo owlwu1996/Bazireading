@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Sparkles, Check, ArrowLeft, User } from 'lucide-react';
+import { Sparkles, Check, ArrowLeft, User, Bitcoin } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useStore } from '../store';
 
@@ -12,6 +12,7 @@ export default function Pricing() {
   const { user, setIsPaid, setIsSubscribed } = useStore();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'bitcoin' | 'lemon'>('bitcoin');
 
   const plans = [
     {
@@ -79,6 +80,35 @@ export default function Pricing() {
     }
   }, []);
 
+  const handleBitcoinCheckout = async () => {
+    if (!selectedPlan) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE}/api/nowpayments/create-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planType: selectedPlan,
+          email: user?.email || '',
+          name: user?.name || '',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.paymentUrl) {
+        window.location.href = data.paymentUrl;
+      } else {
+        throw new Error(data.error || 'Failed to create payment');
+      }
+    } catch (error: any) {
+      console.error('Checkout error:', error);
+      alert('Failed to initialize payment: ' + (error.message || 'Please try again later.'));
+      setLoading(false);
+    }
+  };
+
   const handleLemonSqueezyCheckout = async () => {
     if (!selectedPlan) return;
 
@@ -105,6 +135,14 @@ export default function Pricing() {
       console.error('Checkout error:', error);
       alert('Failed to initialize payment: ' + (error.message || 'Please try again later.'));
       setLoading(false);
+    }
+  };
+
+  const handleCheckout = () => {
+    if (paymentMethod === 'bitcoin') {
+      handleBitcoinCheckout();
+    } else {
+      handleLemonSqueezyCheckout();
     }
   };
 
@@ -187,31 +225,58 @@ export default function Pricing() {
         </div>
 
         {selectedPlan && (
-          <div className="bg-[#1a1a1a]/50 border border-[#D4A853]/10 rounded-xl p-6 text-center">
-            <h3 className="text-lg font-semibold mb-4">
+          <div className="bg-[#1a1a1a]/50 border border-[#D4A853]/10 rounded-xl p-6">
+            <h3 className="text-lg font-semibold mb-4 text-center">
               {selectedPlanInfo?.name} - {selectedPlanInfo?.price}{selectedPlanInfo?.period}
             </h3>
+
+            <div className="flex justify-center gap-4 mb-6">
+              <button
+                onClick={() => setPaymentMethod('bitcoin')}
+                className={`flex items-center px-4 py-2 rounded-lg border transition-all ${
+                  paymentMethod === 'bitcoin'
+                    ? 'border-[#F7931A] bg-[#F7931A]/10 text-[#F7931A]'
+                    : 'border-[#F5F0E8]/20 text-[#F5F0E8]/60 hover:border-[#F5F0E8]/40'
+                }`}
+              >
+                <Bitcoin className="w-5 h-5 mr-2" />
+                Bitcoin
+              </button>
+              <button
+                onClick={() => setPaymentMethod('lemon')}
+                className={`flex items-center px-4 py-2 rounded-lg border transition-all ${
+                  paymentMethod === 'lemon'
+                    ? 'border-[#D4A853] bg-[#D4A853]/10 text-[#D4A853]'
+                    : 'border-[#F5F0E8]/20 text-[#F5F0E8]/60 hover:border-[#F5F0E8]/40'
+                }`}
+              >
+                Credit Card / PayPal
+              </button>
+            </div>
+
             <button
-              onClick={handleLemonSqueezyCheckout}
+              onClick={handleCheckout}
               disabled={loading}
               className="w-full max-w-md mx-auto py-4 bg-gradient-to-r from-[#D4A853] to-[#B87333] text-[#0F0F0F] font-semibold rounded-lg hover:shadow-[0_0_30px_rgba(212,168,83,0.3)] transition-all disabled:opacity-50"
             >
-              {loading ? 'Loading...' : 'Subscribe Now'}
+              {loading ? 'Loading...' : paymentMethod === 'bitcoin' ? 'Pay with Bitcoin' : 'Subscribe Now'}
             </button>
 
             <p className="mt-4 text-center text-[#F5F0E8]/40 text-xs">
-              Secure payment powered by LemonSqueezy. Cancel anytime.
+              {paymentMethod === 'bitcoin'
+                ? 'Secure payment powered by NowPayments. Cryptocurrency accepted worldwide.'
+                : 'Secure payment powered by LemonSqueezy. Cancel anytime.'}
             </p>
 
-            <div className="mt-6 flex items-center justify-center space-x-6 text-[#F5F0E8]/40">
+            <div className="mt-6 flex items-center justify-center space-x-6 text-[#F5F0E8]/40 text-xs">
               <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
                 </svg>
                 Secure Checkout
               </div>
               <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
                 Instant Access
