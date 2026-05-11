@@ -18,7 +18,7 @@ export default function Pricing() {
     {
       id: 'single',
       name: 'Single Report',
-      price: '$9.9',
+      price: '$29',
       period: '',
       description: 'One full Bazi reading with complete analysis',
       features: [
@@ -34,7 +34,7 @@ export default function Pricing() {
     {
       id: 'monthly',
       name: 'Monthly Plan',
-      price: '$9.9',
+      price: '$29',
       period: '/month',
       description: 'Unlimited readings and full access',
       features: [
@@ -50,7 +50,7 @@ export default function Pricing() {
     {
       id: 'yearly',
       name: 'Yearly Plan',
-      price: '$79',
+      price: '$199',
       period: '/year',
       description: 'Best value with annual savings',
       features: [
@@ -58,7 +58,7 @@ export default function Pricing() {
         'Annual forecasts included',
         'Priority support',
         'Exclusive content',
-        'Save 34% vs monthly',
+        'Save 43% vs monthly',
         'Early access to features',
       ],
       highlighted: true,
