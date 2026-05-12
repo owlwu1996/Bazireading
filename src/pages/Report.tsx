@@ -336,9 +336,9 @@ export default function Report() {
           <p style={{ fontSize: '13px', color: '#F5F0E8', opacity: 0.6, margin: '0 0 4px' }}>
             Full Bazi Analysis Report
           </p>
-          {currentChart?.userName && (
+          {(currentChart?.name || currentChart?.userName) && (
             <p style={{ fontSize: '15px', color: '#D4A853', margin: '4px 0 0', fontFamily: "'Cinzel', serif" }}>
-              Prepared for {currentChart.userName}
+              Prepared for {currentChart.name || currentChart.userName}
             </p>
           )}
           <p style={{ fontSize: '11px', color: '#F5F0E8', opacity: 0.4, margin: '6px 0 0' }}>{today}</p>

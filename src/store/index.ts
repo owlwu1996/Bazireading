@@ -3,6 +3,7 @@ import { create } from 'zustand';
 export interface BaziChart {
   id: string;
   dbId?: number;
+  name?: string;
   userName?: string;
   birthDate?: string;
   birthTime?: string;

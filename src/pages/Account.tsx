@@ -69,7 +69,7 @@ export default function Account() {
       setCurrentChart({
         ...chart,
         dbId: item.id,
-        userName: user?.name || 'User',
+        userName: item.name || user?.name || '',
       });
 
       if (item.readingId && item.readingSections) {

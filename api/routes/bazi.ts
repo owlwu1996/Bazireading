@@ -8,7 +8,7 @@ const router = Router();
 
 router.post('/calculate', async (req, res) => {
   try {
-    const { birthDate, birthTime, birthCity, gender } = req.body;
+    const { birthDate, birthTime, birthCity, gender, name } = req.body;
 
     if (!birthDate || !gender) {
       return res.status(400).json({ error: 'Birth date and gender are required' });
@@ -38,11 +38,12 @@ router.post('/calculate', async (req, res) => {
     }
 
     const result = await db.prepare(`
-      INSERT INTO bazi_charts (user_id, birth_date, birth_time, birth_city, gender, four_pillars, five_elements, ten_gods, day_master, life_cycles)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      INSERT INTO bazi_charts (user_id, name, birth_date, birth_time, birth_city, gender, four_pillars, five_elements, ten_gods, day_master, life_cycles)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING id
     `).get(
       userId,
+      name || null,
       birthDate,
       birthTime || '12:00',
       birthCity || '',
@@ -57,6 +58,7 @@ router.post('/calculate', async (req, res) => {
     res.json({
       ...chart,
       dbId: result.id,
+      name: name || null,
       birthDate,
       birthTime: birthTime || '12:00',
       birthCity: birthCity || '',
@@ -178,6 +180,7 @@ router.get('/history', async (req, res) => {
 
     const formattedCharts = charts.map((row: any) => ({
       id: row.id,
+      name: row.name || null,
       birthDate: row.birth_date,
       birthTime: row.birth_time,
       birthCity: row.birth_city,

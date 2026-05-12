@@ -68,7 +68,7 @@ export default function BaziInput() {
       });
 
       const data = await response.json();
-      data.userName = formData.name;
+      data.userName = data.name || formData.name;
       setCurrentChart(data);
 
       const readingResponse = await fetch(API_URLS.baziReading, {

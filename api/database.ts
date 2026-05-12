@@ -50,6 +50,7 @@ if (isPostgres) {
         CREATE TABLE IF NOT EXISTS bazi_charts (
           id SERIAL PRIMARY KEY,
           user_id INTEGER,
+          name TEXT,
           birth_date TEXT NOT NULL,
           birth_time TEXT,
           birth_city TEXT,
@@ -63,6 +64,8 @@ if (isPostgres) {
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
         )
       `);
+      // Add name column if table already exists
+      try { await client.query('ALTER TABLE bazi_charts ADD COLUMN IF NOT EXISTS name TEXT'); } catch {}
       console.log('Bazi charts table created');
 
       console.log('Creating readings table...');
@@ -171,6 +174,7 @@ if (isPostgres) {
     CREATE TABLE IF NOT EXISTS bazi_charts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER,
+      name TEXT,
       birth_date TEXT NOT NULL,
       birth_time TEXT,
       birth_city TEXT,
@@ -183,6 +187,8 @@ if (isPostgres) {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
     );
+    // Add name column if table already exists
+    try { db.prepare('ALTER TABLE bazi_charts ADD COLUMN name TEXT').run(); } catch {}
 
     CREATE TABLE IF NOT EXISTS readings (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
