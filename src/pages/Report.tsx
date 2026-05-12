@@ -71,12 +71,27 @@ export default function Report() {
     if (!exportRef.current) return;
     setSavingImage(true);
     try {
-      const canvas = await html2canvas(exportRef.current, {
+      // Clone the export content into a visible on-screen element
+      const temp = exportRef.current.cloneNode(true) as HTMLElement;
+      temp.style.position = 'fixed';
+      temp.style.left = '0';
+      temp.style.top = '0';
+      temp.style.zIndex = '99999';
+      temp.style.width = '800px';
+      document.body.appendChild(temp);
+
+      // Brief delay so the browser renders the temp element
+      await new Promise(r => setTimeout(r, 100));
+
+      const canvas = await html2canvas(temp, {
         backgroundColor: '#FFFFFF',
         scale: 2,
         allowTaint: true,
         foreignObjectRendering: false,
       });
+
+      document.body.removeChild(temp);
+
       const link = document.createElement('a');
       link.download = `bazi-reading-${Date.now()}.png`;
       link.href = canvas.toDataURL('image/png');
