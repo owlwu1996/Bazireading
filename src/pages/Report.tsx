@@ -64,16 +64,21 @@ export default function Report() {
       const canvas = await html2canvas(reportRef.current, {
         backgroundColor: '#0F0F0F',
         scale: 2,
-        useCORS: true,
+        allowTaint: true,
+        foreignObjectRendering: false,
       });
+      const dataUrl = canvas.toDataURL('image/png');
+      // Open in new tab to verify the image renders correctly
+      window.open(dataUrl, '_blank');
       const link = document.createElement('a');
       link.download = `bazi-reading-${Date.now()}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = dataUrl;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
       console.error('Error saving image:', error);
+      alert('Save failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setSavingImage(false);
     }
