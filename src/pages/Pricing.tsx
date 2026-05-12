@@ -4,7 +4,7 @@ import { Sparkles, Check, ArrowLeft, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useStore } from '../store';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://bazi-reading.onrender.com';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://bazireading-api.onrender.com';
 
 export default function Pricing() {
   const navigate = useNavigate();

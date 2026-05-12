@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'https://bazi-reading.onrender.com';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://bazireading-api.onrender.com';
 
 export const API_URLS = {
   bazi: `${API_BASE}/api/bazi`,
