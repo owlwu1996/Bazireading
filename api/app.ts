@@ -19,8 +19,8 @@ const allowedOrigins = [
   'http://localhost:3000',
 ];
 
-app.use(cors({
-  origin: function(origin, callback) {
+const corsOptions = {
+  origin: function(origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -31,7 +31,9 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['*'],
-}));
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
@@ -43,7 +45,7 @@ app.use('/api/lemonsqueezy', lemonSqueezyRoutes);
 app.use('/api/nowpayments', nowpaymentsRoutes);
 app.use('/api/auth', authRoutes);
 
-app.options('*', cors());
+app.options('*', cors(corsOptions));
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
