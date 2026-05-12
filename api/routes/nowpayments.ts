@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { createPayment, getPaymentStatus, verifyWebhookSignature, parsePaymentStatus } from '../services/nowPayments.js';
-import db from '../database.js';
+import { createPayment, getPaymentStatus, verifyWebhookSignature, parsePaymentStatus } from '../services/nowPayments';
+import db from '../database';
 
 const router = Router();
 

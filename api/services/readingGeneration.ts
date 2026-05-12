@@ -1,4 +1,4 @@
-import { BaziChart } from './baziCalculation.js';
+import { BaziChart } from './baziCalculation';
 
 export interface ReadingSection {
   title: string;

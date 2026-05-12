@@ -1,7 +1,7 @@
 /**
- * local server entry file, for local development
+ * Server entry file for production
  */
-import app from './app.js';
+import app from './app';
 
 /**
  * start server with port

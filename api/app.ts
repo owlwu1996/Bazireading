@@ -1,12 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import baziRoutes from './routes/bazi.js';
-import paymentRoutes from './routes/payment.js';
-import paypalRoutes from './routes/paypal.js';
-import paddleRoutes from './routes/paddle.js';
-import lemonSqueezyRoutes from './routes/lemonSqueezy.js';
-import nowpaymentsRoutes from './routes/nowpayments.js';
-import authRoutes from './routes/auth.js';
+import baziRoutes from './routes/bazi';
+import paymentRoutes from './routes/payment';
+import paypalRoutes from './routes/paypal';
+import paddleRoutes from './routes/paddle';
+import lemonSqueezyRoutes from './routes/lemonSqueezy';
+import nowpaymentsRoutes from './routes/nowpayments';
+import authRoutes from './routes/auth';
 
 const app = express();
 
