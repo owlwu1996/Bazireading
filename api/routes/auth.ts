@@ -66,7 +66,7 @@ router.post('/register', async (req, res) => {
       (order.plan_type === 'monthly' || order.plan_type === 'yearly') && order.status === 'completed'
     );
     const hasSinglePurchase = userOrders.some((order: any) =>
-      order.plan_type === 'single' && order.status === 'completed'
+      ['single', 'full'].includes(order.plan_type) && order.status === 'completed'
     );
 
     res.json({
@@ -113,7 +113,7 @@ router.post('/login', async (req, res) => {
       (order.plan_type === 'monthly' || order.plan_type === 'yearly') && order.status === 'completed'
     );
     const hasSinglePurchase = userOrders.some((order: any) =>
-      order.plan_type === 'single' && order.status === 'completed'
+      ['single', 'full'].includes(order.plan_type) && order.status === 'completed'
     );
 
     res.json({
@@ -151,12 +151,12 @@ router.get('/me', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const userOrders = await db.prepare('SELECT * FROM orders WHERE user_id = $1').all(user.id);
+    const userOrders = await db.prepare('SELECT * FROM orders WHERE user_id = $1').all(decoded.userId);
     const hasActiveSubscription = userOrders.some((order: any) =>
       (order.plan_type === 'monthly' || order.plan_type === 'yearly') && order.status === 'completed'
     );
     const hasSinglePurchase = userOrders.some((order: any) =>
-      order.plan_type === 'single' && order.status === 'completed'
+      ['single', 'full'].includes(order.plan_type) && order.status === 'completed'
     );
 
     res.json({
@@ -170,41 +170,8 @@ router.get('/me', async (req, res) => {
     });
   } catch (error) {
     console.error('Get user error:', error);
-    res.status(500).json({ error: 'Failed to get user info' });
+    res.status(500).json({ error: 'Failed to get user' });
   }
 });
 
-router.get('/verify-purchase', async (req, res) => {
-  try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'No token provided' });
-    }
-
-    const token = authHeader.split(' ')[1];
-    const decoded = verifyToken(token);
-    if (!decoded) {
-      return res.status(401).json({ error: 'Invalid or expired token' });
-    }
-
-    const userOrders = await db.prepare('SELECT * FROM orders WHERE user_id = $1 AND status = $2').all(decoded.userId, 'completed');
-    const hasActiveSubscription = userOrders.some((order: any) =>
-      (order.plan_type === 'monthly' || order.plan_type === 'yearly')
-    );
-    const hasSinglePurchase = userOrders.some((order: any) =>
-      order.plan_type === 'single'
-    );
-
-    res.json({
-      isPaid: hasActiveSubscription || hasSinglePurchase,
-      isSubscribed: hasActiveSubscription,
-      orders: userOrders,
-    });
-  } catch (error) {
-    console.error('Verify purchase error:', error);
-    res.status(500).json({ error: 'Failed to verify purchase' });
-  }
-});
-
-export { router as authRouter };
 export default router;
