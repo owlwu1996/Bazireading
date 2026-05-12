@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import './i18n';
 import Home from './pages/Home';
 import BaziInput from './pages/BaziInput';
@@ -26,6 +27,7 @@ function App() {
         <Route path="/auth" element={<Auth />} />
         <Route path="/account" element={<Account />} />
       </Routes>
+      <Analytics />
     </BrowserRouter>
   );
 }
