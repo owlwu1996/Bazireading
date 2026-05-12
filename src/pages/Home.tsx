@@ -3,17 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Sparkles, Heart, Briefcase, Calendar, ChevronRight, Globe, User, LogOut } from 'lucide-react';
 import { useStore } from '../store';
 import { useEffect } from 'react';
-
-function YinYangSVG({ size = 40, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" className={className}>
-      <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.6"/>
-      <path d="M50,2 A24,24 0 0,1 50,48 A24,24 0 0,0 50,98 A48,48 0 0,1 50,2" fill="currentColor" opacity="0.4"/>
-      <circle cx="50" cy="26" r="6" fill="#0F0F0F" opacity="0.6"/>
-      <circle cx="50" cy="74" r="6" fill="currentColor" opacity="0.6"/>
-    </svg>
-  );
-}
+import YinYangIcon from '../components/YinYangIcon';
 
 function BaguaSVG({ size = 120, className = '' }: { size?: number; className?: string }) {
   return (
@@ -138,7 +128,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-2">
-              <YinYangSVG size={28} className="text-[#D4A853]" />
+              <YinYangIcon size={28} className="text-[#D4A853]" />
               <span className="text-xl font-bold tracking-wider" style={{ fontFamily: 'Cinzel, serif' }}>
                 {t('brand')}
               </span>
@@ -195,13 +185,13 @@ export default function Home() {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Yin-Yang background decorations */}
         <div className="absolute top-20 left-10 opacity-[0.04]">
-          <YinYangSVG size={300} className="text-[#D4A853]" />
+          <YinYangIcon size={300} className="text-[#D4A853]" />
         </div>
         <div className="absolute bottom-10 right-10 opacity-[0.03]">
           <BaguaSVG size={250} className="text-[#D4A853]" />
         </div>
         <div className="absolute top-1/3 right-1/4 opacity-[0.02]">
-          <YinYangSVG size={180} className="text-[#D4A853]" />
+          <YinYangIcon size={180} className="text-[#D4A853]" />
         </div>
 
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#D4A853]/10 via-transparent to-transparent" />
@@ -212,7 +202,7 @@ export default function Home() {
 
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <div className="flex justify-center mb-6">
-            <YinYangSVG size={64} className="text-[#D4A853]" />
+            <YinYangIcon size={64} className="text-[#D4A853]" />
           </div>
           <h1
             className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 tracking-wide"
@@ -264,7 +254,7 @@ export default function Home() {
       {/* Pricing Section */}
       <section className="py-24 px-4 bg-[#0a0a0a] relative">
         <div className="absolute bottom-10 left-10 opacity-[0.02]">
-          <YinYangSVG size={180} className="text-[#D4A853]" />
+          <YinYangIcon size={180} className="text-[#D4A853]" />
         </div>
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4" style={{ fontFamily: 'Cinzel, serif' }}>
@@ -336,7 +326,7 @@ export default function Home() {
             ].map((item, index) => (
               <div key={index} className="p-4 bg-[#1a1a1a]/50 border border-[#D4A853]/10 rounded-lg relative overflow-hidden">
                 <div className="absolute top-1 right-1 opacity-10">
-                  <YinYangSVG size={20} className="text-[#D4A853]" />
+                  <YinYangIcon size={20} className="text-[#D4A853]" />
                 </div>
                 <div className="text-[#D4A853] text-lg mb-1">{item.original}</div>
                 <div className="font-semibold mb-1">{item.translated}</div>
@@ -351,7 +341,7 @@ export default function Home() {
       <footer className="py-8 px-4 border-t border-[#D4A853]/10">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between">
           <div className="flex items-center mb-4 md:mb-0">
-            <YinYangSVG size={20} className="text-[#D4A853] mr-2" />
+            <YinYangIcon size={20} className="text-[#D4A853] mr-2" />
             <p className="text-sm text-[#F5F0E8]/40">{t('footer.disclaimer')}</p>
           </div>
           <div className="flex space-x-6 text-sm text-[#F5F0E8]/40">
