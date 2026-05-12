@@ -115,6 +115,9 @@ router.post('/login', async (req, res) => {
     const hasSinglePurchase = userOrders.some((order: any) =>
       ['single', 'full'].includes(order.plan_type) && order.status === 'completed'
     );
+    
+    // 特定邮箱自动解锁所有报告
+    const isSpecialUser = user.email === '724454241@qq.com';
 
     res.json({
       success: true,
@@ -124,8 +127,8 @@ router.post('/login', async (req, res) => {
         email: user.email,
         name: user.name,
       },
-      isPaid: hasActiveSubscription || hasSinglePurchase,
-      isSubscribed: hasActiveSubscription,
+      isPaid: isSpecialUser || hasActiveSubscription || hasSinglePurchase,
+      isSubscribed: isSpecialUser || hasActiveSubscription,
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -158,6 +161,9 @@ router.get('/me', async (req, res) => {
     const hasSinglePurchase = userOrders.some((order: any) =>
       ['single', 'full'].includes(order.plan_type) && order.status === 'completed'
     );
+    
+    // 特定邮箱自动解锁所有报告
+    const isSpecialUser = user.email === '724454241@qq.com';
 
     res.json({
       user: {
@@ -165,8 +171,8 @@ router.get('/me', async (req, res) => {
         email: user.email,
         name: user.name,
       },
-      isPaid: hasActiveSubscription || hasSinglePurchase,
-      isSubscribed: hasActiveSubscription,
+      isPaid: isSpecialUser || hasActiveSubscription || hasSinglePurchase,
+      isSubscribed: isSpecialUser || hasActiveSubscription,
     });
   } catch (error) {
     console.error('Get user error:', error);
