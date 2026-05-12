@@ -12,6 +12,7 @@
     "check": "tsc --noEmit",
     "server:dev": "nodemon",
     "server": "tsx api/server.ts",
+    "start": "tsx api/server.ts",
     "dev": "concurrently \"npm run client:dev\" \"npm run server:dev\""
   },
   "dependencies": {
