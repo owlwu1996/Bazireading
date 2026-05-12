@@ -60,20 +60,49 @@ export default function Report() {
     if (!reportRef.current) return;
     setSavingImage(true);
     try {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
       const element = reportRef.current;
       const scale = 2;
-      canvas.width = element.offsetWidth * scale;
-      canvas.height = element.offsetHeight * scale;
+      const width = element.offsetWidth;
+      const height = element.offsetHeight;
+
+      // Collect all <style> text from the document
+      const styleText = Array.from(document.querySelectorAll('style'))
+        .map(s => s.textContent)
+        .join('\n');
+
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', String(width));
+      svg.setAttribute('height', String(height));
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+      const foreignObject = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+      foreignObject.setAttribute('width', '100%');
+      foreignObject.setAttribute('height', '100%');
+      foreignObject.innerHTML = `<div xmlns="http://www.w3.org/1999/xhtml"><style>${styleText}</style>${element.innerHTML}</div>`;
+      svg.appendChild(foreignObject);
+
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
       ctx.scale(scale, scale);
-      ctx.fillStyle = '#0f0f0f';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
       const img = new Image();
-      img.crossOrigin = 'anonymous';
-      await new Promise((resolve) => { img.onload = resolve; img.src = element.innerHTML; });
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = url;
+      });
+      ctx.fillStyle = '#0F0F0F';
+      ctx.fillRect(0, 0, width, height);
       ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+
       const link = document.createElement('a');
       link.download = `bazi-reading-${Date.now()}.png`;
       link.href = canvas.toDataURL('image/png');
