@@ -7,6 +7,7 @@ import { API_URLS } from '../lib/api';
 
 interface HistoryItem {
   id: number;
+  name?: string;
   birthDate: string;
   birthTime: string;
   birthCity: string;
