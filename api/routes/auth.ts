@@ -69,6 +69,9 @@ router.post('/register', async (req, res) => {
       ['single', 'full'].includes(order.plan_type) && order.status === 'completed'
     );
 
+    // 特定邮箱自动解锁所有报告
+    const isSpecialUser = email === '724454241@qq.com';
+
     res.json({
       success: true,
       token,
@@ -77,8 +80,8 @@ router.post('/register', async (req, res) => {
         email,
         name: name || null,
       },
-      isPaid: hasActiveSubscription || hasSinglePurchase,
-      isSubscribed: hasActiveSubscription,
+      isPaid: isSpecialUser || hasActiveSubscription || hasSinglePurchase,
+      isSubscribed: isSpecialUser || hasActiveSubscription,
     });
   } catch (error) {
     console.error('Register error:', error);
