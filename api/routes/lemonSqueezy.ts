@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { createCheckout, parseWebhookEvent } from '../services/lemonSqueezy';
-import db from '../database';
+import { createCheckout, parseWebhookEvent } from '../services/lemonSqueezy.js';
+import db from '../database.js';
 
 const router = Router();
 

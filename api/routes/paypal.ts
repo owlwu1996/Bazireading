@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { createOrder, captureOrder } from '../services/paypal';
-import db from '../database';
+import { createOrder, captureOrder } from '../services/paypal.js';
+import db from '../database.js';
 
 const router = Router();
 

@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { calculateBazi } from '../services/baziCalculation';
-import { generateReading, generateCompatibilityReading } from '../services/readingGeneration';
-import db from '../database';
-import { verifyToken } from './auth';
+import { calculateBazi } from '../services/baziCalculation.js';
+import { generateReading, generateCompatibilityReading } from '../services/readingGeneration.js';
+import db from '../database.js';
+import { verifyToken } from './auth.js';
 
 const router = Router();
 
