@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Camera, Lock, Unlock, User, Scale, Heart, Briefcase, Calendar, TrendingUp, Sparkles, Loader2 } from 'lucide-react';
+import { Camera, Unlock, User, Scale, Heart, Briefcase, Calendar, TrendingUp, Sparkles, Loader2 } from 'lucide-react';
 import { useStore } from '../store';
 import { API_URLS } from '../lib/api';
-import ShareCTA from '../components/ShareCTA';
-import BrandWatermark from '../components/BrandWatermark';
 import { useNavigate } from 'react-router-dom';
 
 const iconMap: Record<string, any> = {
@@ -21,13 +19,12 @@ export default function Report() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const reportRef = useRef<HTMLDivElement>(null);
-  const { currentChart, currentReading, setCurrentReading, user } = useStore();
+  const { currentChart, currentReading, setCurrentReading, isPaid } = useStore();
   const [reading, setReading] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [savingImage, setSavingImage] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<number>>(new Set([0]));
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const isPaid = user?.isPaid || false;
 
   const generateReading = async (type: 'basic' | 'full') => {
     if (!currentChart) return;
@@ -155,7 +152,7 @@ export default function Report() {
                     {expandedSections.has(index) && isLocked && (
                       <div className="px-3 pb-2">
                         <div className="text-sm text-[#F5F0E8]/40 text-center py-4 italic">
-                          {t('report.locked_content')}
+                          {t('report.locked_content') || 'Content locked'}
                         </div>
                       </div>
                     )}
@@ -164,9 +161,6 @@ export default function Report() {
               })}
             </div>
           ) : null}
-
-          <ShareCTA />
-          <BrandWatermark />
         </div>
 
         <div className="mt-6 p-3 bg-[#1a1a1a]/30 border border-[#D4A853]/10 rounded-lg text-center">
