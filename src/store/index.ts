@@ -4,6 +4,10 @@ export interface BaziChart {
   id: string;
   dbId?: number;
   userName?: string;
+  birthDate?: string;
+  birthTime?: string;
+  birthCity?: string;
+  gender?: string;
   fourPillars: {
     year: { stem: string; branch: string; element: string; stemPinyin: string; branchPinyin: string };
     month: { stem: string; branch: string; element: string; stemPinyin: string; branchPinyin: string };

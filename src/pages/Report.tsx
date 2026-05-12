@@ -344,11 +344,11 @@ export default function Report() {
                   )}
                   <tr>
                     <td style={{ padding: '6px 12px', color: '#666' }}>Birth Date</td>
-                    <td style={{ padding: '6px 12px', fontWeight: 600 }}>{currentChart.birth_date || currentChart.birthDate || '—'}</td>
+                    <td style={{ padding: '6px 12px', fontWeight: 600 }}>{currentChart.birthDate || '—'}</td>
                   </tr>
                   <tr>
                     <td style={{ padding: '6px 12px', color: '#666' }}>Birth Time</td>
-                    <td style={{ padding: '6px 12px', fontWeight: 600 }}>{currentChart.birth_time || currentChart.birthTime || '12:00'}</td>
+                    <td style={{ padding: '6px 12px', fontWeight: 600 }}>{currentChart.birthTime || '12:00'}</td>
                   </tr>
                   <tr>
                     <td style={{ padding: '6px 12px', color: '#666' }}>Gender</td>

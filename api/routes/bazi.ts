@@ -57,6 +57,10 @@ router.post('/calculate', async (req, res) => {
     res.json({
       ...chart,
       dbId: result.id,
+      birthDate,
+      birthTime: birthTime || '12:00',
+      birthCity: birthCity || '',
+      gender,
     });
   } catch (error) {
     console.error('Bazi calculation error:', error);
