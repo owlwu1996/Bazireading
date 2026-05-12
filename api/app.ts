@@ -10,30 +10,12 @@ import authRoutes from './routes/auth';
 
 const app = express();
 
-const allowedOrigins = [
-  'https://bazireading.cc',
-  'https://www.bazireading.cc',
-  'https://bazireading.vercel.app',
-  'https://bazireading-git-master-owlwu1996.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:3000',
-];
-
-const corsOptions = {
-  origin: function(origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+app.use(cors({
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['*'],
-};
-
-app.use(cors(corsOptions));
+}));
 
 app.use(express.json());
 
@@ -44,8 +26,6 @@ app.use('/api/paddle', paddleRoutes);
 app.use('/api/lemonsqueezy', lemonSqueezyRoutes);
 app.use('/api/nowpayments', nowpaymentsRoutes);
 app.use('/api/auth', authRoutes);
-
-app.options('*', cors(corsOptions));
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
