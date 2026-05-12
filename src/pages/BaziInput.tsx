@@ -9,7 +9,7 @@ import BaguaLoader from '../components/BaguaLoader';
 export default function BaziInput() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { setCurrentChart, setCurrentReading, setIsLoading, isLoading, user, authToken } = useStore();
+  const { setCurrentChart, setCurrentReading, setIsLoading, isLoading, user, authToken, isPaid } = useStore();
   const isAuthenticated = !!user;
 
   const [formData, setFormData] = useState({
@@ -76,7 +76,7 @@ export default function BaziInput() {
         headers,
         body: JSON.stringify({
           baziId: data.dbId,
-          type: 'basic',
+          type: isPaid ? 'full' : 'basic',
         }),
       });
 

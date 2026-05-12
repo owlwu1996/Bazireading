@@ -83,7 +83,11 @@ export default function Report() {
   };
 
   useEffect(() => {
-    if (currentReading) {
+    if (currentReading && currentReading.type === 'full') {
+      setReading(currentReading);
+    } else if (currentReading && currentReading.type === 'basic' && isPaid) {
+      generateReading('full');
+    } else if (currentReading) {
       setReading(currentReading);
     } else if (currentChart) {
       generateReading(isPaid ? 'full' : 'basic');
