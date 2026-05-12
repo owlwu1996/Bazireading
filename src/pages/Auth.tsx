@@ -17,7 +17,7 @@ export default function Auth() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/${isLogin ? 'login' : 'register'}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://bazi-reading.onrender.com'}/api/auth/${isLogin ? 'login' : 'register'}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name: name || undefined }),
