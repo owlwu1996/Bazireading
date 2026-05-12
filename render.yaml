@@ -3,7 +3,7 @@ services:
     name: bazi-reading-api
     env: node
     plan: starter
-    buildCommand: npm install && npm install -g tsx
+    buildCommand: npm install && npm install -g tsx && npx vite build
     startCommand: npx tsx api/server.ts
     healthCheckPath: /api/health
     envVars:
