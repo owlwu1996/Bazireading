@@ -7,7 +7,6 @@ import Compatibility from './pages/Compatibility';
 import Pricing from './pages/Pricing';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
-import Refund from './pages/Refund';
 import Auth from './pages/Auth';
 import Account from './pages/Account';
 
@@ -22,7 +21,6 @@ function App() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
-        <Route path="/refund" element={<Refund />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/account" element={<Account />} />
       </Routes>

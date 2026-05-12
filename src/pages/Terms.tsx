@@ -64,7 +64,7 @@ export default function Terms() {
             <p>
               We offer a 7-day money-back guarantee for all purchases. If you are not satisfied with
               your reading, contact us within 7 days of purchase for a full refund. Subscription refunds
-              are prorated based on unused time. Please see our Refund Policy page for complete details.
+              are prorated based on unused time.
             </p>
           </section>
 

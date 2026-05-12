@@ -347,7 +347,6 @@ export default function Home() {
           <div className="flex space-x-6 text-sm text-[#F5F0E8]/40">
             <span onClick={() => navigate('/privacy')} className="hover:text-[#D4A853] cursor-pointer transition-colors">{t('footer.privacy')}</span>
             <span onClick={() => navigate('/terms')} className="hover:text-[#D4A853] cursor-pointer transition-colors">{t('footer.terms')}</span>
-            <span onClick={() => navigate('/refund')} className="hover:text-[#D4A853] cursor-pointer transition-colors">Refund Policy</span>
           </div>
         </div>
       </footer>
