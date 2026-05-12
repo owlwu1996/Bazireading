@@ -92,12 +92,22 @@ if (isPostgres) {
           status TEXT DEFAULT 'pending',
           payment_method TEXT,
           payment_id TEXT,
+          visitor_id TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           paid_at TIMESTAMP,
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
         )
       `);
       console.log('Orders table created');
+
+      try {
+        await client.query(`
+          ALTER TABLE orders ADD COLUMN IF NOT EXISTS visitor_id TEXT
+        `);
+        console.log('Added visitor_id column to orders table');
+      } catch (err) {
+        console.log('visitor_id column already exists or error:', err);
+      }
 
       console.log('Creating compatibilities table...');
       await client.query(`
@@ -195,6 +205,7 @@ if (isPostgres) {
       status TEXT DEFAULT 'pending',
       payment_method TEXT,
       payment_id TEXT,
+      visitor_id TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       paid_at DATETIME,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
@@ -224,6 +235,12 @@ if (isPostgres) {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
   `);
+
+  try {
+    sqliteDb.exec(`ALTER TABLE orders ADD COLUMN visitor_id TEXT`);
+  } catch (err) {
+    console.log('visitor_id column already exists or error:', err);
+  }
 
   console.log('SQLite database initialized');
 }
