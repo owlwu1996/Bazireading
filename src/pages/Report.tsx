@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import html2canvas from 'html2canvas';
 import { Camera, Unlock, User, Scale, Heart, Briefcase, Calendar, TrendingUp, Sparkles, Loader2 } from 'lucide-react';
 import { useStore } from '../store';
 import { API_URLS } from '../lib/api';
@@ -60,90 +61,20 @@ export default function Report() {
     if (!reportRef.current) return;
     setSavingImage(true);
     try {
-      const element = reportRef.current;
-      const clone = element.cloneNode(true) as HTMLElement;
-      const scale = 2;
-      const width = element.offsetWidth;
-      const height = element.offsetHeight;
-
-      // Recursively inline all computed styles so the SVG is self-contained
-      const inlineStyles = (source: HTMLElement, target: HTMLElement) => {
-        const computed = window.getComputedStyle(source);
-        const cssText = Array.from(computed)
-          .map(k => `${k}:${computed.getPropertyValue(k)}`)
-          .join(';');
-        target.style.cssText = cssText;
-        for (let i = 0; i < source.children.length; i++) {
-          if (source.children[i] instanceof HTMLElement && target.children[i] instanceof HTMLElement) {
-            inlineStyles(source.children[i] as HTMLElement, target.children[i] as HTMLElement);
-          }
-        }
-      };
-      inlineStyles(element, clone);
-
-      // Wrap in a div that carries the root element's inline styles
-      const wrapperHTML = `<div style="${clone.style.cssText}">${clone.innerHTML}</div>`;
-
-      // Build SVG using DOM APIs so XMLSerializer handles escaping correctly
-      const svgNS = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(svgNS, 'svg');
-      svg.setAttribute('width', String(width));
-      svg.setAttribute('height', String(height));
-      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-
-      const fo = document.createElementNS(svgNS, 'foreignObject');
-      fo.setAttribute('width', '100%');
-      fo.setAttribute('height', '100%');
-      const xhtmlDiv = document.createElement('div');
-      xhtmlDiv.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-      xhtmlDiv.innerHTML = wrapperHTML;
-      fo.appendChild(xhtmlDiv);
-      svg.appendChild(fo);
-
-      const svgData = new XMLSerializer().serializeToString(svg);
-      const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-
-      const canvas = document.createElement('canvas');
-      canvas.width = width * scale;
-      canvas.height = height * scale;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) { setSavingImage(false); return; }
-
-      const img = new Image();
-      img.onload = () => {
-        ctx.scale(scale, scale);
-        ctx.fillStyle = '#0F0F0F';
-        ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0);
-        URL.revokeObjectURL(url);
-
-        const dataUrl = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.download = `bazi-reading-${Date.now()}.png`;
-        link.href = dataUrl;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setSavingImage(false);
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        // Fallback: save as HTML file
-        const htmlBlob = new Blob(['<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;background:#0F0F0F;}</style></head><body>' + wrapperHTML + '</body></html>'], { type: 'text/html;charset=utf-8' });
-        const fallbackUrl = URL.createObjectURL(htmlBlob);
-        const link = document.createElement('a');
-        link.download = `bazi-reading-${Date.now()}.html`;
-        link.href = fallbackUrl;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(fallbackUrl);
-        setSavingImage(false);
-      };
-      img.src = url;
+      const canvas = await html2canvas(reportRef.current, {
+        backgroundColor: '#0F0F0F',
+        scale: 2,
+        useCORS: true,
+      });
+      const link = document.createElement('a');
+      link.download = `bazi-reading-${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (error) {
       console.error('Error saving image:', error);
+    } finally {
       setSavingImage(false);
     }
   };
