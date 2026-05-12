@@ -35,6 +35,7 @@ const resources = {
       },
       report: {
         title: 'Your Bazi Reading',
+        subtitle: 'Your personalized Chinese astrology analysis',
         freePreview: 'Free Preview',
         fullReport: 'Full Report',
         personality: 'Personality Profile',
@@ -114,6 +115,7 @@ const resources = {
       },
       report: {
         title: 'Tu Lectura Bazi',
+        subtitle: 'Tu análisis personalizado de astrología china',
         freePreview: 'Vista Previa Gratuita',
         fullReport: 'Informe Completo',
         personality: 'Perfil de Personalidad',
@@ -193,6 +195,7 @@ const resources = {
       },
       report: {
         title: 'Votre Lecture Bazi',
+        subtitle: 'Votre analyse astrologique chinoise personnalisée',
         freePreview: 'Aperçu Gratuit',
         fullReport: 'Rapport Complet',
         personality: 'Profil de Personnalité',
@@ -279,6 +282,7 @@ const resources = {
       },
       report: {
         title: 'Ihre Bazi-Lesung',
+        subtitle: 'Ihre persönliche chinesische Astrologie-Analyse',
         freePreview: 'Kostenlose Vorschau',
         fullReport: 'Vollständiger Bericht',
         personality: 'Persönlichkeitsprofil',
@@ -358,6 +362,7 @@ const resources = {
       },
       report: {
         title: '你的八字解析',
+        subtitle: '你的个性化中国占星分析',
         freePreview: '免费预览',
         fullReport: '完整报告',
         personality: '性格分析',

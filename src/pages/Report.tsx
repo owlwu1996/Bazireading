@@ -84,7 +84,7 @@ export default function Report() {
       await new Promise(r => setTimeout(r, 100));
 
       const canvas = await html2canvas(temp, {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#0F0F0F',
         scale: 2,
         allowTaint: true,
         foreignObjectRendering: false,
@@ -317,72 +317,47 @@ export default function Report() {
           position: 'fixed',
           left: '-9999px',
           top: 0,
-          width: '800px',
-          background: '#FFFFFF',
-          color: '#1a1a1a',
-          fontFamily: "'Crimson Text', 'Georgia', serif",
-          fontSize: '16px',
-          lineHeight: '1.8',
-          padding: '60px 50px',
+          width: '720px',
+          background: '#0F0F0F',
+          color: '#F5F0E8',
+          fontFamily: "'Outfit', 'Georgia', sans-serif",
+          fontSize: '14px',
+          lineHeight: '1.7',
+          padding: '40px 36px',
           zIndex: -1,
         }}
       >
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-          <YinYangIcon size={56} className="text-[#B8860B]" />
-          <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: '32px', color: '#B8860B', margin: '16px 0 4px', letterSpacing: '4px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+          <YinYangIcon size={40} className="text-[#D4A853]" />
+          <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: '26px', color: '#D4A853', margin: '12px 0 2px', letterSpacing: '3px' }}>
             BaziReading
           </h1>
-          <p style={{ fontSize: '18px', color: '#555', margin: '0 0 8px', fontStyle: 'italic' }}>
+          <p style={{ fontSize: '13px', color: '#F5F0E8', opacity: 0.6, margin: '0 0 4px' }}>
             Full Bazi Analysis Report
           </p>
-          <p style={{ fontSize: '13px', color: '#999', margin: 0 }}>{today}</p>
+          {currentChart?.userName && (
+            <p style={{ fontSize: '15px', color: '#D4A853', margin: '4px 0 0', fontFamily: "'Cinzel', serif" }}>
+              Prepared for {currentChart.userName}
+            </p>
+          )}
+          <p style={{ fontSize: '11px', color: '#F5F0E8', opacity: 0.4, margin: '6px 0 0' }}>{today}</p>
         </div>
 
-        {/* Divider */}
-        <div style={{ borderTop: '1px solid #e0d5c0', marginBottom: '40px' }} />
+        <div style={{ borderTop: '1px solid rgba(212,168,83,0.25)', marginBottom: '28px' }} />
 
         {currentChart && (
           <>
-            {/* Personal Info */}
-            <div style={{ marginBottom: '35px' }}>
-              <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: '18px', color: '#B8860B', borderBottom: '2px solid #B8860B', paddingBottom: '6px', marginBottom: '16px', letterSpacing: '2px' }}>
-                PERSONAL INFORMATION
-              </h2>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '15px' }}>
-                <tbody>
-                  {currentChart.userName && (
-                    <tr>
-                      <td style={{ padding: '6px 12px', color: '#666', width: '120px' }}>Name</td>
-                      <td style={{ padding: '6px 12px', fontWeight: 600 }}>{currentChart.userName}</td>
-                    </tr>
-                  )}
-                  <tr>
-                    <td style={{ padding: '6px 12px', color: '#666' }}>Birth Date</td>
-                    <td style={{ padding: '6px 12px', fontWeight: 600 }}>{currentChart.birthDate || '—'}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '6px 12px', color: '#666' }}>Birth Time</td>
-                    <td style={{ padding: '6px 12px', fontWeight: 600 }}>{currentChart.birthTime || '12:00'}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '6px 12px', color: '#666' }}>Gender</td>
-                    <td style={{ padding: '6px 12px', fontWeight: 600, textTransform: 'capitalize' }}>{currentChart.gender || '—'}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
             {/* Bazi Chart */}
-            <div style={{ marginBottom: '35px' }}>
-              <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: '18px', color: '#B8860B', borderBottom: '2px solid #B8860B', paddingBottom: '6px', marginBottom: '16px', letterSpacing: '2px' }}>
-                BAZI CHART &bull; FOUR PILLARS
+            <div style={{ marginBottom: '28px' }}>
+              <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: '15px', color: '#D4A853', borderBottom: '1px solid rgba(212,168,83,0.3)', paddingBottom: '5px', marginBottom: '12px', letterSpacing: '2px' }}>
+                BAZI CHART
               </h2>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #ddd' }}>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                     {['Year', 'Month', 'Day', 'Hour'].map(h => (
-                      <th key={h} style={{ padding: '10px', fontSize: '12px', color: '#999', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '1px' }}>{h}</th>
+                      <th key={h} style={{ padding: '8px', fontSize: '10px', color: '#F5F0E8', opacity: 0.5, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '1px' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -391,11 +366,11 @@ export default function Report() {
                     {['year', 'month', 'day', 'hour'].map(pillar => {
                       const data = currentChart.fourPillars[pillar as keyof typeof currentChart.fourPillars];
                       return (
-                        <td key={pillar} style={{ padding: '14px 10px' }}>
-                          <div style={{ fontSize: '28px', fontWeight: 700, color: '#B8860B', fontFamily: "'Cinzel', serif" }}>
+                        <td key={pillar} style={{ padding: '10px 8px' }}>
+                          <div style={{ fontSize: '24px', fontWeight: 700, color: '#D4A853', fontFamily: "'Cinzel', serif" }}>
                             {data.stem}{data.branch}
                           </div>
-                          <div style={{ fontSize: '13px', color: elementColors[data.element] || '#888', marginTop: '4px', textTransform: 'capitalize' }}>
+                          <div style={{ fontSize: '11px', color: elementColors[data.element] || '#F5F0E8', opacity: 0.7, marginTop: '2px', textTransform: 'capitalize' }}>
                             {data.element}
                           </div>
                         </td>
@@ -407,47 +382,47 @@ export default function Report() {
             </div>
 
             {/* Five Elements */}
-            <div style={{ marginBottom: '35px' }}>
-              <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: '18px', color: '#B8860B', borderBottom: '2px solid #B8860B', paddingBottom: '6px', marginBottom: '16px', letterSpacing: '2px' }}>
+            <div style={{ marginBottom: '28px' }}>
+              <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: '15px', color: '#D4A853', borderBottom: '1px solid rgba(212,168,83,0.3)', paddingBottom: '5px', marginBottom: '12px', letterSpacing: '2px' }}>
                 FIVE ELEMENTS
               </h2>
-              <div style={{ maxWidth: '500px', margin: '0 auto' }}>
+              <div style={{ maxWidth: '460px', margin: '0 auto' }}>
                 {Object.entries(currentChart.fiveElements).map(([element, value]) => (
-                  <div key={element} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                    <span style={{ width: '80px', fontSize: '14px', color: '#555', textTransform: 'capitalize' }}>
+                  <div key={element} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ width: '70px', fontSize: '12px', opacity: 0.7, textTransform: 'capitalize' }}>
                       {element} {chineseElementNames[element]}
                     </span>
-                    <div style={{ flex: 1, height: '8px', background: '#f0f0f0', borderRadius: '4px', overflow: 'hidden', margin: '0 12px' }}>
+                    <div style={{ flex: 1, height: '7px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden', margin: '0 10px' }}>
                       <div style={{
                         width: `${(value / 10) * 100}%`,
                         height: '100%',
-                        borderRadius: '4px',
+                        borderRadius: '3px',
                         backgroundColor: elementColors[element],
                       }} />
                     </div>
-                    <span style={{ width: '30px', fontSize: '13px', color: '#999', textAlign: 'right' }}>{value.toFixed(1)}</span>
+                    <span style={{ width: '28px', fontSize: '12px', opacity: 0.5, textAlign: 'right' }}>{value.toFixed(1)}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Life Cycles */}
-            <div style={{ marginBottom: '35px' }}>
-              <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: '18px', color: '#B8860B', borderBottom: '2px solid #B8860B', paddingBottom: '6px', marginBottom: '16px', letterSpacing: '2px' }}>
+            <div style={{ marginBottom: '28px' }}>
+              <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: '15px', color: '#D4A853', borderBottom: '1px solid rgba(212,168,83,0.3)', paddingBottom: '5px', marginBottom: '12px', letterSpacing: '2px' }}>
                 LIFE CYCLES
               </h2>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #ddd' }}>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                     {currentChart.lifeCycles.map((cycle: any, i: number) => (
-                      <th key={i} style={{ padding: '8px 4px', fontSize: '11px', color: '#999', fontWeight: 400 }}>{cycle.age}</th>
+                      <th key={i} style={{ padding: '6px 3px', fontSize: '10px', opacity: 0.5, fontWeight: 400 }}>{cycle.age}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     {currentChart.lifeCycles.map((cycle: any, i: number) => (
-                      <td key={i} style={{ padding: '8px 4px', fontSize: '15px', fontWeight: 600, fontFamily: "'Cinzel', serif", color: elementColors[cycle.element] || '#333' }}>
+                      <td key={i} style={{ padding: '6px 3px', fontSize: '13px', fontWeight: 600, fontFamily: "'Cinzel', serif", color: elementColors[cycle.element] || '#F5F0E8' }}>
                         {cycle.stem}{cycle.branch}
                       </td>
                     ))}
@@ -458,27 +433,27 @@ export default function Report() {
 
             {/* Reading sections - all expanded */}
             {reading && reading.sections && (
-              <div style={{ marginBottom: '35px' }}>
-                <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: '18px', color: '#B8860B', borderBottom: '2px solid #B8860B', paddingBottom: '6px', marginBottom: '20px', letterSpacing: '2px' }}>
-                  DETAILED ANALYSIS
+              <div style={{ marginBottom: '28px' }}>
+                <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: '15px', color: '#D4A853', borderBottom: '1px solid rgba(212,168,83,0.3)', paddingBottom: '5px', marginBottom: '14px', letterSpacing: '2px' }}>
+                  ANALYSIS
                 </h2>
                 {reading.sections.map((section: any, idx: number) => (
-                  <div key={idx} style={{ marginBottom: '24px' }}>
+                  <div key={idx} style={{ marginBottom: '18px' }}>
                     <h3 style={{
                       fontFamily: "'Cinzel', serif",
-                      fontSize: '16px',
-                      color: '#B8860B',
-                      marginBottom: '10px',
-                      paddingBottom: '4px',
-                      borderBottom: '1px dotted #e0d5c0',
+                      fontSize: '14px',
+                      color: '#D4A853',
+                      marginBottom: '6px',
+                      paddingBottom: '3px',
+                      borderBottom: '1px dotted rgba(212,168,83,0.2)',
                     }}>
                       {section.title}
                     </h3>
                     <div
-                      style={{ fontSize: '15px', color: '#444', lineHeight: '1.9' }}
+                      style={{ fontSize: '13px', opacity: 0.8, lineHeight: '1.8', paddingLeft: '4px' }}
                       dangerouslySetInnerHTML={{
                         __html: section.content
-                          .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#B8860B;">$1</strong>')
+                          .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#D4A853;">$1</strong>')
                           .replace(/\*(.*?)\*/g, '<em>$1</em>')
                           .replace(/\[LOCKED\]/g, '')
                       }}
@@ -489,12 +464,12 @@ export default function Report() {
             )}
 
             {/* Footer */}
-            <div style={{ borderTop: '1px solid #e0d5c0', paddingTop: '20px', textAlign: 'center' }}>
-              <p style={{ fontSize: '12px', color: '#aaa', fontStyle: 'italic' }}>
+            <div style={{ borderTop: '1px solid rgba(212,168,83,0.2)', paddingTop: '16px', textAlign: 'center' }}>
+              <p style={{ fontSize: '11px', opacity: 0.4 }}>
                 Generated by BaziReading &bull; {today}
               </p>
-              <p style={{ fontSize: '11px', color: '#ccc', marginTop: '4px' }}>
-                This report is for informational purposes only.
+              <p style={{ fontSize: '10px', opacity: 0.3, marginTop: '2px' }}>
+                For informational purposes only.
               </p>
             </div>
           </>
